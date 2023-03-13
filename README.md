@@ -28,5 +28,5 @@ This database models characteristics of events and players in the competitive Va
    - Write SQL script to populate DB with tables and data
 
 # Task Assignment
-Backend: Anna Wang + Eric Leung
-Frontend: Chris Lee
+- Backend: Anna Wang + Eric Leung
+- Frontend: Chris Lee
