@@ -77,27 +77,61 @@ function showTable($result) { //prints results from a select statement
 
 }
 
+function sameMatchTable($result) { //prints results from a select statement
+	echo "<center><h2>Here are your results!</h2></center>";
+	echo "<table>";
+	echo "<tr><th>Match ID</th></tr>";
+
+	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+		echo "<tr><td>" . $row[0] . "</td><tr>";
+    }
+	echo "</table>";
+
+}
+
 if ($db_conn) {
-    #using join, selection, projection, aggregation with having
+    # using join, selection, projection, aggregation with having
+    # Finds player in-game name with the highest kills in stats so far
     if (array_key_exists('highest combat score player', $_POST)) {
         $result = executePlainSQL("
         SELECT in_game_name, MAX(sum_kills) as kills
         FROM (
             SELECT tm_id, weapon_name, SUM(kills) as sum_kills
             FROM Player AS p
-            JOIN UsesWeapon AS uw 
+            INNER JOIN UsesWeapon AS uw
             ON p.tm_id = uw.tm_id
             GROUP BY p.tm_id, uw.weapon_name
             HAVING SUM(kills) > 0 
             ) AS player_kills
-        JOIN TeamMemberContract AS tmc 
+        INNER JOIN TeamMemberContract AS tmc 
         ON player_kills.tm_id = tmc.tm_id
         GROUP BY tmr.in_game_name;");
         showTable($result);
         OCICommit($db_conn);
     }
+
+    # Using division
+    # Checks for matches that have both indicated players participating in
+    if (array_key_exists('Same Match for Two Players', $_POST)) {
+        $player1 = $_POST['Player 1 (In-game name)'];
+        $player2 = $_POST['Player 2 (In-game name)'];
+        $result1 = executePlainSQL("
+        SELECT DISTINCT m_id
+        FROM (
+            SELECT ap1.tm_id AS player1_tm_id, ap2.tm_id AS player2_tm_id, ap1.m_id
+            FROM AgentPlayed AS ap1
+            INNER JOIN AgentPlayed AS ap2 
+            ON ap1.m_id = ap2.m_id),
+        TeamMemberContract AS tmc1,
+        TeamMemberContract AS tmc2
+        WHERE tmc1.in_game_name ='" . $player1 . "' AND tmc2.in_game_name='" . $player2 . "' 
+        AND tmc1.tm_id = player1_tm_id
+        AND tmc2.tm_id = player2_tm_id");
+        sameMatchTable($result1);
+        OCICommit($db_conn);
+    }
+
     if (array_key_exists("log off")) {
         OCILogoff($db_conn);
     }
 }
-
