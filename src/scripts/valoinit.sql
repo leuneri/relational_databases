@@ -9,7 +9,7 @@ DROP TABLE SeriesInEvent;
 DROP TABLE StagedEvent;
 DROP TABLE OnlineEvent;
 DROP TABLE ParticipatingIn;
-DROP TABLE Contract;
+-- DROP TABLE Contract;
 DROP TABLE Coach;
 DROP TABLE Player;
 DROP TABLE HistoricalMatchup;
@@ -102,8 +102,9 @@ CREATE TABLE Player (
 grant select on Player to public;
 
 CREATE TABLE Weapon (
-	weapon_name CHAR(255) PRIMARY KEY,
-	damage INTEGER
+	weapon_name CHAR(255),
+	damage INTEGER,
+	PRIMARY KEY (weapon_name)
 );
 grant select on Weapon to public;
 
@@ -154,7 +155,8 @@ CREATE TABLE MatchInSeries (
 grant select on MatchInSeries to public;
 
 CREATE TABLE Map (
-	map_name CHAR(255) PRIMARY KEY
+	map_name CHAR(255),
+	PRIMARY KEY (map_name)
 );
 grant select on Map to public;
  
@@ -259,11 +261,11 @@ INSERT INTO Player VALUES(3, 'Radiant #220', 'Initiator');
 INSERT INTO Player VALUES(5, 'Radiant #24', 'Controller');
 INSERT INTO Player VALUES(6, 'Radiant #1', 'Duelist');
 
-INSERT INTO Weapon VALUES('Sheriff', 159)
-INSERT INTO Weapon VALUES('Marshal', 202)
-INSERT INTO Weapon VALUES('Vandal', 160)
-INSERT INTO Weapon VALUES('Classic', 78)
-INSERT INTO Weapon VALUES('Guardian', 195)
+INSERT INTO Weapon VALUES('Sheriff', 159);
+INSERT INTO Weapon VALUES('Marshal', 202);
+INSERT INTO Weapon VALUES('Vandal', 160);
+INSERT INTO Weapon VALUES('Classic', 78);
+INSERT INTO Weapon VALUES('Guardian', 195);
 
 INSERT INTO UsesWeapon VALUES(1, 'Vandal', 177.1, 0.361);
 INSERT INTO UsesWeapon VALUES(1, 'Marshal', 120.9, 0.247);
@@ -301,11 +303,11 @@ INSERT INTO SeriesInEvent VALUES(3, DATE '2021-05-30', 1, 2);
 INSERT INTO SeriesInEvent VALUES(4, DATE '2022-07-14', 5, 3);
 INSERT INTO SeriesInEvent VALUES(5, DATE '2022-07-17', 4, 3);
 
--- INSERT INTO MatchInSeries(1, 19, 3, '13:6', 2);
--- INSERT INTO MatchInSeries(2, 20, 3, '13:7', 2);
--- INSERT INTO MatchInSeries(3, 16, 2, '13:3', 1);
--- INSERT INTO MatchInSeries(4, 28, 5, '15:13', 1);
--- INSERT INTO MatchInSeries(5, 34, 2, '18:16', 1);
+INSERT INTO MatchInSeries VALUES(1, 19, 3, '13:6', 2);
+INSERT INTO MatchInSeries VALUES(2, 20, 3, '13:7', 2);
+INSERT INTO MatchInSeries VALUES(3, 16, 2, '13:3', 1);
+INSERT INTO MatchInSeries VALUES(4, 28, 5, '15:13', 1);
+INSERT INTO MatchInSeries VALUES(5, 34, 2, '18:16', 1);
 
 INSERT INTO Map VALUES('Ascent');
 INSERT INTO Map VALUES('Fracture');
