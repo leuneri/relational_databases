@@ -101,4 +101,3 @@ if ($db_conn) {
     }
 }
 
-// division (matches/players): Eric
