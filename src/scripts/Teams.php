@@ -88,7 +88,8 @@ if ($db_conn) {
         $result = executePlainSQL("
         UPDATE ParticipatingIn
         SET o_id ='" . $new_oid . "', e_id ='" . $new_eid . "'
-        WHERE od_id ='" . $current_oid . "' , e_id ='" . $current_eid . "'    ");
+        WHERE od_id ='" . $current_oid . "' , e_id ='" . $current_eid . "';    
+	");
         showTable($result);
         OCICommit($db_conn);
     }
