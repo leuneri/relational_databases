@@ -80,7 +80,7 @@ function showTable($result) { //prints results from a select statement
 if ($db_conn) {
     #using join, selection, projection, aggregation with having
     if (array_key_exists('highest combat score player', $_POST)) {
-        executePlainSQL("
+        $result = executePlainSQL("
         SELECT in_game_name, MAX(sum_kills) as kills
         FROM (
             SELECT tm_id, weapon_name, SUM(kills) as sum_kills
@@ -92,12 +92,12 @@ if ($db_conn) {
             ) AS player_kills
         JOIN TeamMemberContract AS tmc 
         ON player_kills.tm_id = tmc.tm_id
-        GROUP BY tmr.in_game_name;")
-        showTable()
+        GROUP BY tmr.in_game_name;");
+        showTable($result);
         OCICommit($db_conn);
     }
     if (array_key_exists("log off")) {
-        OCILogoff($db_conn)
+        OCILogoff($db_conn);
     }
 }
 
