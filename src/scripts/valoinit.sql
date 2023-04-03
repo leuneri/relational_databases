@@ -49,8 +49,8 @@ grant select on HistoricalMatchup to public;
 CREATE TABLE Event (
 	e_id INTEGER PRIMARY KEY,
 	name CHAR(255) NOT NULL,
-	start_date DATE NOT NULL,
-	end_date DATE NOT NULL,
+	start_date DATE,
+	end_date DATE,
 	winning_organization INTEGER,
 	prize_pool REAL NOT NULL,
 	FOREIGN KEY (winning_organization) REFERENCES OrganizationID (o_id)
@@ -341,15 +341,14 @@ INSERT INTO Agent VALUES(6, 'Sova', 0.47);
 INSERT INTO Agent VALUES(13, 'Breach', 0.41);
 INSERT INTO Agent VALUES(3, 'Omen', 0.41);
 
-INSERT INTO AgentPlayed VALUES(4841, 8521, 10);
-INSERT INTO AgentPlayed VALUES(574, 8522, 6);
-INSERT INTO AgentPlayed VALUES(51, 7724, 1);
-INSERT INTO AgentPlayed VALUES(89, 10553, 8);
-INSERT INTO AgentPlayed VALUES(4841, 9921, 3);
+INSERT INTO AgentPlayed VALUES(1, 1, 10);
+INSERT INTO AgentPlayed VALUES(2, 1, 6);
+INSERT INTO AgentPlayed VALUES(2, 3, 1);
+INSERT INTO AgentPlayed VALUES(1, 3, 8);
+INSERT INTO AgentPlayed VALUES(2, 4, 3);
 
 INSERT INTO AvgCombatScore VALUES(20, 8, 8, 1, 5, 16, 346);
 INSERT INTO AvgCombatScore VALUES(15, 11, 10, 2, 3, 19, 217);
 INSERT INTO AvgCombatScore VALUES(32, 19, 6, 0, 2, 23, 395);
 INSERT INTO AvgCombatScore VALUES(28, 14, 4, 0, 1, 21, 348);
 INSERT INTO AvgCombatScore VALUES(25, 12, 7, 4, 1, 20, 359);
-

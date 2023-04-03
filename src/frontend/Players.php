@@ -275,6 +275,8 @@
 				WHERE tmc1.in_game_name ='" . $player1 . "' AND tmc2.in_game_name='" . $player2 . "' 
 				AND tmc1.tm_id = player1_tm_id
 				AND tmc2.tm_id = player2_tm_id");
+            $row = oci_fetch_row($result);
+            echo $row;
             //sameMatchTable($result);
 			OCICommit($db_conn);
         }
