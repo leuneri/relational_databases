@@ -48,21 +48,15 @@
     <h2>List of Teams</h2>
     <form method="GET" action="Organizations.php" id="orgListForm">
         <input type="hidden" id="showOrgListRequest" name="showOrgListRequest">
-        <!-- <input type="submit" name="showOrgListRequest" value="Show"></p> -->
+        <input type="submit" name="showOrgListRequest" value="Show"></p>
     </form>
-
-    <script>
-        window.onload = function() {
-            let orgListForm = document.getElementById("orgListForm");
-            orgListForm.submit();
-        };
-    </script>
 
 	<?php	//this tells the system that it's no longer just parsing html; it's now parsing PHP
 
         $success = True; //keep track of errors so it redirects the page only if there are no errors
         $db_conn = NULL; // edit the login credentials in connectToDB()
         $show_debug_alert_messages = False; // set to True if you want alerts to show you which methods are being triggered (see how it is used in debugAlertMessage())
+        $doc = new DomDocument;
 
         function debugAlertMessage($message) {
             global $show_debug_alert_messages;
