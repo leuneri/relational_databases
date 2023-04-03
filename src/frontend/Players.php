@@ -263,6 +263,7 @@
             global $db_conn;
             $player1 = $_POST['player1'];
 			$player2 = $_POST['player2'];
+            //TODO ERIC: also missing right parenthesis
             $result = executePlainSQL("
 				SELECT DISTINCT m_id
 				FROM (
