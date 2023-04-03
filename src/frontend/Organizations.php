@@ -12,6 +12,14 @@
             Winrate: <input type="text" name="ins_winrate"> <br /><br />
             <input type="submit" value="Insert" name="insertSubmit"></p>
         </form>
+    <h2>Update Organization Ranking</h2>
+        <form method="POST" action="Organizations.php"> <!--refresh page when submitted-->
+            <input type="hidden" id="updateQueryRequest" name="updateQueryRequest">
+            Organization: <input type="text" name="upd_org_name"> <br /><br />
+            <!--TODO Eric: change entered name-> O_id to be used in query-->
+            New Winrate: <input type="text" name="upd_wr"> <br /><br />            
+            <input type="submit" value="Update" name="updateSubmit"></p>
+        </form>
 	<?php
 		//this tells the system that it's no longer just parsing html; it's now parsing PHP
 
@@ -87,16 +95,35 @@
             }
         }
 
-        function printResult($result) { //prints results from a select statement
-            echo "<br>Retrieved data from table Organization:<br>";
-            echo "<table>";
-            echo "<tr><th>ID</th><th>Name</th></tr>";
+        //TODO CHRIS: show the table goodluck with formatting
+        function handleShowOrgTable($result) { //prints results from a select statement
 
-            while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-                echo "<tr><td>" . $row["ID"] . "</td><td>" . $row["NAME"] . "</td></tr>"; //or just use "echo $row[0]"
-            }
+            global $db_conn;
 
-            echo "</table>";
+            // $result = executePlainSQL("SELECT * FROM Organization");
+            // showOrgTable($result)
+            
+            // echo "<br>Retrieved data from table Organization:<br>";
+            // echo "<table>";
+            // echo "<tr><th>Name</th><th>Ranking</th></tr>Region</th></tr>Win Rate";
+
+            // while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+            //     echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td></tr>" . $row["region"] . "</td></tr>" $row["win_rate"]; //or just use "echo $row[0]"
+            // }
+
+            // echo "</table>";
+        }
+
+        function showOrganizationParticipatingInTable($result) { //prints results from a select statement
+            // echo "<center><h2>Here are your results!</h2></center>";
+            // echo "<table>";
+            // echo "<tr><th>Organization ID</th><th>Event ID</th></tr>";
+        
+            // while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+            //     echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td><tr>";
+            // }
+            // echo "</table>";
+        
         }
 
         function connectToDB() {
@@ -126,12 +153,15 @@
 
         function handleUpdateRequest() {
             global $db_conn;
-
-            $old_name = $_POST['oldName'];
-            $new_name = $_POST['newName'];
-
-            // you need the wrap the old name and new name values with single quotations
-            executePlainSQL("UPDATE demoTable SET name='" . $new_name . "' WHERE name='" . $old_name . "'");
+            $upd_org_name = $_POST['upd_org_name'];
+            $upd_wr = $_POST['upd_wr'];
+            //TODO ERIC: get o_id, then update request
+            $result = executePlainSQL("
+                UPDATE ParticipatingIn
+                SET o_id ='" . $new_oid . "', e_id ='" . $new_eid . "'
+                WHERE od_id ='" . $current_oid . "' , e_id ='" . $current_eid . "';    
+            ");
+            showOrganizationParticipatingInTable($result);
             OCICommit($db_conn);
         }
 
