@@ -1,148 +1,317 @@
-<?php
+<!--Test Oracle file for UBC CPSC304 2018 Winter Term 1
+  Created by Jiemin Zhang
+  Modified by Simona Radu
+  Modified by Jessica Wong (2018-06-22)
+  This file shows the very basics of how to execute PHP commands
+  on Oracle.
+  Specifically, it will drop a table, create a table, insert values
+  update values, and then query for values
 
-$success = True; //keep track of errors so it redirects the page only if there are no errors
-$db_conn = OCILogon("ora_leung147", "a47358213", "dbhost.ugrad.cs.ubc.ca:1522/ug");
+  IF YOU HAVE A TABLE CALLED "demoTable" IT WILL BE DESTROYED
 
-function executePlainSQL($cmdstr) { 
-    global $db_conn, $success;
-    $statement = OCIParse($db_conn, $cmdstr); 
-    if (!$statement) {
-        echo "<br>Cannot parse the following command: " . $cmdstr . "<br>";
-        $e = OCI_Error($db_conn); // For OCIParse errors pass the       
-        // connection handle
-        echo htmlentities($e['message']);
-        $success = False;
-    }
+  The script assumes you already have a server set up
+  All OCI commands are commands to the Oracle libraries
+  To get the file to work, you must place it somewhere where your
+  Apache server can run it, and you must rename it to have a ".php"
+  extension.  You must also change the username and password on the
+  OCILogon below to be your ORACLE username and password -->
 
-    $r = OCIExecute($statement, OCI_DEFAULT);
-    if (!$r) {
-        echo "<br>Cannot execute the following command: " . $cmdstr . "<br>";
-        $e = oci_error($statement);
-        echo htmlentities($e['message']);
-        $success = False;
-    } else {
+  <html>
+    <head>
+        <title>Players</title>
+    </head>
 
-    }
-    return $statement;
-}
+    <body>
+        <h2>Get the average damage per round across all weapons</h2>
+        <form method="GET" action="Players.php"> <!--refresh page when submitted-->
+            <input type="hidden" id="dmg_allweapons" name="dmg_allweapons">
+            <input type="submit" name="dmg_allweapons"></p>
+        </form>
 
-function executeBoundSQL($cmdstr, $list) {
-    /* Sometimes the same statement will be executed for several times ... only
-    the value of variables need to be changed.
-    In this case, you don't need to create the statement several times; 
-    using bind variables can make the statement be shared and just parsed once.
-    This is also very useful in protecting against SQL injection.  
-    See the sample code below for how this functions is used */
+        <hr />
 
-    global $db_conn, $success;
-    $statement = OCIParse($db_conn, $cmdstr);
+        <h2>Finds player in-game name with the highest kills in stats so far</h2>
+        <form method="GET" action="Players.php"> <!--refresh page when submitted-->
+            <input type="hidden" id="highestkills" name="highestkills">
+            <input type="submit" name="highestkills"></p>
+        </form>
+        <h2>Checks if two players have played in the same match</h2>
+        <form method="POST" action="Players.php"> <!--refresh page when submitted-->
+            <input type="hidden" id="checkPlayersSameMatchRequest" name="checkPlayersSameMatchRequest">
+            First Player: <input type="text" name="player1"> <br /><br />
+            Second Player: <input type="text" name="player2"> <br /><br />            
+            <input type="submit" value="Submit" name="checkPlayersSubmit"></p>
+        </form>
 
-    if (!$statement) {
-        echo "<br>Cannot parse the following command: " . $cmdstr . "<br>";
-        $e = OCI_Error($db_conn);
-        echo htmlentities($e['message']);
-        $success = False;
-    }
+        <?php
+		//this tells the system that it's no longer just parsing html; it's now parsing PHP
 
-    foreach ($list as $tuple) {
-        foreach ($tuple as $bind => $val) {
-            //echo $val;
-            //echo "<br>".$bind."<br>";
-            OCIBindByName($statement, $bind, $val);
-            unset ($val); //make sure you do not remove this. Otherwise $val will remain in an array object wrapper which will not be recognized by Oracle as a proper datatype
+        $success = True; //keep track of errors so it redirects the page only if there are no errors
+        $db_conn = NULL; // edit the login credentials in connectToDB()
+        $show_debug_alert_messages = False; // set to True if you want alerts to show you which methods are being triggered (see how it is used in debugAlertMessage())
 
+        function debugAlertMessage($message) {
+            global $show_debug_alert_messages;
+
+            if ($show_debug_alert_messages) {
+                echo "<script type='text/javascript'>alert('" . $message . "');</script>";
+            }
         }
-        $r = OCIExecute($statement, OCI_DEFAULT);
-        if (!$r) {
-            echo "<br>Cannot execute the following command: " . $cmdstr . "<br>";
-            $e = OCI_Error($statement); // For OCIExecute errors pass the statement handle
-            echo htmlentities($e['message']);
-            echo "<br>";
-            $success = False;
+
+        function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
+            //echo "<br>running ".$cmdstr."<br>";
+            global $db_conn, $success;
+
+            $statement = OCIParse($db_conn, $cmdstr);
+            //There are a set of comments at the end of the file that describe some of the OCI specific functions and how they work
+
+            if (!$statement) {
+                echo "<br>Cannot parse the following command: " . $cmdstr . "<br>";
+                $e = OCI_Error($db_conn); // For OCIParse errors pass the connection handle
+                echo htmlentities($e['message']);
+                $success = False;
+            }
+
+            $r = OCIExecute($statement, OCI_DEFAULT);
+            if (!$r) {
+                echo "<br>Cannot execute the following command: " . $cmdstr . "<br>";
+                $e = oci_error($statement); // For OCIExecute errors pass the statementhandle
+                echo htmlentities($e['message']);
+                $success = False;
+            }
+
+			return $statement;
+		}
+
+        function executeBoundSQL($cmdstr, $list) {
+            /* Sometimes the same statement will be executed several times with different values for the variables involved in the query.
+		In this case you don't need to create the statement several times. Bound variables cause a statement to only be
+		parsed once and you can reuse the statement. This is also very useful in protecting against SQL injection.
+		See the sample code below for how this function is used */
+
+			global $db_conn, $success;
+			$statement = OCIParse($db_conn, $cmdstr);
+
+            if (!$statement) {
+                echo "<br>Cannot parse the following command: " . $cmdstr . "<br>";
+                $e = OCI_Error($db_conn);
+                echo htmlentities($e['message']);
+                $success = False;
+            }
+
+            foreach ($list as $tuple) {
+                foreach ($tuple as $bind => $val) {
+                    //echo $val;
+                    //echo "<br>".$bind."<br>";
+                    OCIBindByName($statement, $bind, $val);
+                    unset ($val); //make sure you do not remove this. Otherwise $val will remain in an array object wrapper which will not be recognized by Oracle as a proper datatype
+				}
+
+                $r = OCIExecute($statement, OCI_DEFAULT);
+                if (!$r) {
+                    echo "<br>Cannot execute the following command: " . $cmdstr . "<br>";
+                    $e = OCI_Error($statement); // For OCIExecute errors, pass the statementhandle
+                    echo htmlentities($e['message']);
+                    echo "<br>";
+                    $success = False;
+                }
+            }
         }
-                
-    }
 
-}
+        function showTable($result) { //prints results from a select statement
+            echo "<center><h2>Here are your results!</h2></center>";
+            echo "<table>";
+            echo "<tr><th>In-game Name</th><th>Number of Kills</th></tr>";
+        
+            while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+                echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td><tr>";
+            }
+            echo "</table>";
+        
+        }
+        
+        function sameMatchTable($result) { //prints results from a select statement
+            echo "<center><h2>Here are your results!</h2></center>";
+            echo "<table>";
+            echo "<tr><th>Match ID</th></tr>";
+        
+            while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+                echo "<tr><td>" . $row[0] . "</td><tr>";
+            }
+            echo "</table>";
+        
+        }
 
-function showTable($result) { //prints results from a select statement
-	echo "<center><h2>Here are your results!</h2></center>";
-	echo "<table>";
-	echo "<tr><th>In-game Name</th><th>Number of Kills</th></tr>";
+        function connectToDB() {
+            global $db_conn;
 
-	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-		echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td><tr>";
-    }
-	echo "</table>";
+            // Your username is ora_(CWL_ID) and the password is a(student number). For example,
+			// ora_platypus is the username and a12345678 is the password.
+            $db_conn = OCILogon("ora_annaw245", "a59754044", "dbhost.students.cs.ubc.ca:1522/stu");
 
-}
+            if ($db_conn) {
+                debugAlertMessage("Database is Connected");
+                return true;
+            } else {
+                debugAlertMessage("Cannot connect to Database");
+                $e = OCI_Error(); // For OCILogon errors pass no handle
+                echo htmlentities($e['message']);
+                return false;
+            }
+        }
 
-function sameMatchTable($result) { //prints results from a select statement
-	echo "<center><h2>Here are your results!</h2></center>";
-	echo "<table>";
-	echo "<tr><th>Match ID</th></tr>";
+        function disconnectFromDB() {
+            global $db_conn;
 
-	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-		echo "<tr><td>" . $row[0] . "</td><tr>";
-    }
-	echo "</table>";
+            debugAlertMessage("Disconnect from Database");
+            OCILogoff($db_conn);
+        }
 
-}
+        function handleUpdateRequest() {
+            global $db_conn;
 
-if ($db_conn) {
-    # using aggregation to group by player and find the player's '
-    # average damage per round across all weapons
-    if (array_key_exists('dmg_allweapons', $_GET)) {
-        $result = executePlainSQL("SELECT TMC.in_game_name, AVG(UW.average_damage_per_round) 
-        FROM TeamMemberContract TMC 
-        JOIN UsesWeapon UW ON TMC.tm_id = UW.tm_id 
-        GROUP BY TMC.in_game_name");
-        showDmgTable($result);
-        OCICommit($db_conn);
-    }
+            $old_name = $_POST['oldName'];
+            $new_name = $_POST['newName'];
 
-    # using join, selection, projection, aggregation with having
-    # Finds player in-game name with the highest kills in stats so far
-    if (array_key_exists('highest combat score player', $_POST)) {
-        $result = executePlainSQL("
-        SELECT in_game_name, MAX(sum_kills) as kills
-        FROM (
-            SELECT tm_id, weapon_name, SUM(kills) as sum_kills
-            FROM Player AS p
-            INNER JOIN UsesWeapon AS uw
-            ON p.tm_id = uw.tm_id
-            GROUP BY p.tm_id, uw.weapon_name
-            HAVING SUM(kills) > 0 
-            ) AS player_kills
-        INNER JOIN TeamMemberContract AS tmc 
-        ON player_kills.tm_id = tmc.tm_id
-        GROUP BY tmr.in_game_name;");
-        showTable($result);
-        OCICommit($db_conn);
-    }
+            // you need the wrap the old name and new name values with single quotations
+            executePlainSQL("UPDATE demoTable SET name='" . $new_name . "' WHERE name='" . $old_name . "'");
+            OCICommit($db_conn);
+        }
 
-    # Using division
-    # Checks for matches that have both indicated players participating in
-    if (array_key_exists('Same Match for Two Players', $_POST)) {
-        $player1 = $_POST['Player 1 (In-game name)'];
-        $player2 = $_POST['Player 2 (In-game name)'];
-        $result1 = executePlainSQL("
-        SELECT DISTINCT m_id
-        FROM (
-            SELECT ap1.tm_id AS player1_tm_id, ap2.tm_id AS player2_tm_id, ap1.m_id
-            FROM AgentPlayed AS ap1
-            INNER JOIN AgentPlayed AS ap2 
-            ON ap1.m_id = ap2.m_id),
-        TeamMemberContract AS tmc1,
-        TeamMemberContract AS tmc2
-        WHERE tmc1.in_game_name ='" . $player1 . "' AND tmc2.in_game_name='" . $player2 . "' 
-        AND tmc1.tm_id = player1_tm_id
-        AND tmc2.tm_id = player2_tm_id");
-        sameMatchTable($result1);
-        OCICommit($db_conn);
-    }
+        function handleResetRequest() {
+            global $db_conn;
+            // Drop old table
+            executePlainSQL("DROP TABLE demoTable");
 
-    if (array_key_exists("log off")) {
-        OCILogoff($db_conn);
-    }
-}
+            // Create new table
+            echo "<br> creating new table <br>";
+            executePlainSQL("CREATE TABLE demoTable (id int PRIMARY KEY, name char(30))");
+            OCICommit($db_conn);
+        }
+
+        function handleInsertRequest() {
+            global $db_conn;
+
+            //Getting the values from user and insert data into the table
+            $tuple = array (
+                ":bind1" => $_POST['insNo'],
+                ":bind2" => $_POST['insName']
+            );
+
+            $alltuples = array (
+                $tuple
+            );
+
+            executeBoundSQL("insert into demoTable values (:bind1, :bind2)", $alltuples);
+            OCICommit($db_conn);
+        }
+
+        function handleAvgDmgAllWeapons() {
+            global $db_conn;
+            if (array_key_exists('dmg_allweapons', $_GET)) {
+                $result = executePlainSQL("SELECT TMC.in_game_name, AVG(UW.average_damage_per_round) 
+                FROM TeamMemberContract TMC 
+                JOIN UsesWeapon UW ON TMC.tm_id = UW.tm_id 
+                GROUP BY TMC.in_game_name");
+                showDmgTable($result);
+                OCICommit($db_conn);
+            }
+        }
+
+        //TODO CHRIS
+        function showDmgTable($result){
+            while (($row = oci_fetch_row($result)) != false) {
+                echo "<br> The dmg_allweapons: " . $row[0] . $row[1] ."<br>";
+            }
+        }
+
+        function handleHighestKills(){
+            global $db_conn;
+            if (array_key_exists('highestkills', $_GET)) {
+                //TODO ERIC: check this query pls
+                $result = executePlainSQL("
+                SELECT in_game_name, MAX(sum_kills) as kills
+                FROM (
+                    SELECT tm_id, weapon_name, SUM(kills) as sum_kills
+                    FROM Player AS p
+                    INNER JOIN UsesWeapon AS uw
+                    ON p.tm_id = uw.tm_id
+                    GROUP BY p.tm_id, uw.weapon_name
+                    HAVING SUM(kills) > 0 
+                    ) AS player_kills
+                INNER JOIN TeamMemberContract AS tmc 
+                ON player_kills.tm_id = tmc.tm_id
+                GROUP BY tmr.in_game_name;");
+                showPlayerHighestKills($result);
+                OCICommit($db_conn);
+            }
+        }
+
+        //TODO CRHIS
+        function showPlayerHighestKills(){
+            echo "<center><h2>Here are your results!</h2></center>";
+            echo "<table>";
+            echo "<tr><th>In-game Name</th><th>Number of Kills</th></tr>";
+
+            while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+                echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td><tr>";
+            }
+            echo "</table>";
+        }
+
+        function handleCheckPlayersSameMatch(){
+            global $db_conn;
+            $player1 = $_POST['player1'];
+			$player2 = $_POST['player2'];
+            $result = executePlainSQL("
+				SELECT DISTINCT m_id
+				FROM (
+					SELECT ap1.tm_id AS player1_tm_id, ap2.tm_id AS player2_tm_id, ap1.m_id
+					FROM AgentPlayed AS ap1
+					INNER JOIN AgentPlayed AS ap2 
+					ON ap1.m_id = ap2.m_id),
+				TeamMemberContract AS tmc1,
+				TeamMemberContract AS tmc2
+				WHERE tmc1.in_game_name ='" . $player1 . "' AND tmc2.in_game_name='" . $player2 . "' 
+				AND tmc1.tm_id = player1_tm_id
+				AND tmc2.tm_id = player2_tm_id");
+            //sameMatchTable($result);
+			OCICommit($db_conn);
+        }
+
+        //TODO CHRIS: 
+        // function sameMatchTable($result){
+        // }
+
+        // HANDLE ALL POST ROUTES
+	// A better coding practice is to have one method that reroutes your requests accordingly. It will make it easier to add/remove functionality.
+        function handlePOSTRequest() {
+            if (connectToDB()) {
+                if (array_key_exists('checkPlayersSameMatchRequest', $_POST)) {
+                    handleCheckPlayersSameMatch();
+                } 
+                disconnectFromDB();
+            }
+        }
+
+        // HANDLE ALL GET ROUTES
+	// A better coding practice is to have one method that reroutes your requests accordingly. It will make it easier to add/remove functionality.
+        function handleGETRequest() {
+            if (connectToDB()) {
+                if (array_key_exists('dmg_allweapons', $_GET)) {
+                    handleAvgDmgAllWeapons();
+                } else if (array_key_exists('highestkills', $_GET)) {
+                    handleHighestKills();
+                }
+                disconnectFromDB();
+            }
+        }
+
+		if (isset($_POST['checkPlayersSubmit'])) {
+            handlePOSTRequest();
+        } else {
+            handleGETRequest();
+        }
+		?>
+	</body>
+</html>
