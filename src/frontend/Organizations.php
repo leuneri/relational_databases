@@ -3,6 +3,11 @@
         <title>Valorant Organizations</title>
     </head>
     <body>
+    <h2>Leading Region</h2>
+        <form method="GET" action="Organizations.php">
+            <input type="hidden" id="regionAvgWinRate" name="regionAvgWinRate">
+            <input type="submit" name="regionAvgWinRate"></p>
+        </form>
 	<h2>Add new Organization</h2>
         <form method="POST" action="Organizations.php"> <!--refresh page when submitted-->
             <input type="hidden" id="insertQueryRequest" name="insertQueryRequest">
@@ -239,6 +244,19 @@
             }
         }
 
+        function handleRegionAvgWinRate(){ 
+            global $db_conn;
+
+            executePlainSQL("CREATE VIEW RegionAvgWinRate AS SELECT O.region, AVG(O.win_rate) AS avgwr FROM Organization O GROUP BY O.region");
+            $result = executePlainSQL("SELECT region, avgwr FROM RegionAvgWinRate WHERE avgwr = (SELECT MAX(avgwr) FROM RegionAvgWinRate)");
+            executePlainSQL("DROP VIEW RegionAvgWinRate");
+
+            if (($row = oci_fetch_row($result)) != false) {
+                echo "<br> The top region is " . $row[0] . "<br>";
+            }
+
+        }
+
         // HANDLE ALL POST ROUTES
 	// A better coding practice is to have one method that reroutes your requests accordingly. It will make it easier to add/remove functionality.
         function handlePOSTRequest() {
@@ -262,6 +280,9 @@
                 if (array_key_exists('countTuples', $_GET)) {
                     handleCountRequest();
                 }
+                if (array_key_exists('regionAvgWinRate', $_GET)) {
+                    handleRegionAvgWinRate();
+                }
 
                 disconnectFromDB();
             }
@@ -269,7 +290,7 @@
 
 		if (isset($_POST['deleteSubmit']) || isset($_POST['updateSubmit']) || isset($_POST['insertSubmit'])) {
             handlePOSTRequest();
-        } else if (isset($_GET['countTupleRequest'])) {
+        } else {
             handleGETRequest();
         }
 		?>
