@@ -1,8 +1,15 @@
 <html>    
 	<head>
         <title>Valorant Organizations</title>
+        <link rel="stylesheet" href="style.css">
     </head>
     <body>
+    <div class="topMenu">
+        <h2>Navigation</h2>
+        <form method="GET" action="Players.php">
+            <input type="submit" name="navigateToPlayers" value="Players">
+        </form>
+    </div>
     <h2>Leading Region</h2>
         <form method="GET" action="Organizations.php">
             <input type="hidden" id="regionAvgWinRate" name="regionAvgWinRate">
