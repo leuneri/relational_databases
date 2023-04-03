@@ -90,6 +90,17 @@ function sameMatchTable($result) { //prints results from a select statement
 }
 
 if ($db_conn) {
+    # using aggregation to group by player and find the player's '
+    # average damage per round across all weapons
+    if (array_key_exists('dmg_allweapons', $_GET)) {
+        $result = executePlainSQL("SELECT TMC.in_game_name, AVG(UW.average_damage_per_round) 
+        FROM TeamMemberContract TMC 
+        JOIN UsesWeapon UW ON TMC.tm_id = UW.tm_id 
+        GROUP BY TMC.in_game_name");
+        showDmgTable($result);
+        OCICommit($db_conn);
+    }
+
     # using join, selection, projection, aggregation with having
     # Finds player in-game name with the highest kills in stats so far
     if (array_key_exists('highest combat score player', $_POST)) {
