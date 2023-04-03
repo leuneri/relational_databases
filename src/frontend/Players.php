@@ -27,7 +27,12 @@
             <form method="GET" action="Organizations.php">
                 <input type="submit" name="navigateToOrganizations" value="Organizations">
             </form>
+            <form method="GET" action="Players.php">
+                <input type="submit" name="navigateToPlayers" value="Players">
+            </form>
+            <br /><hr />
         </div>
+        <h1 class="pageTitle">Players</h1>
         <h2>Get the average damage per round across all weapons</h2>
         <form method="GET" action="Players.php"> <!--refresh page when submitted-->
             <input type="hidden" id="dmg_allweapons" name="dmg_allweapons">

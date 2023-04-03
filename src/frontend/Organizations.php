@@ -6,10 +6,17 @@
     <body>
     <div class="topMenu">
         <h2>Navigation</h2>
-        <form method="GET" action="Players.php">
-            <input type="submit" name="navigateToPlayers" value="Players">
-        </form>
+        <div class="menuButtons">
+            <form method="GET" action="Organizations.php">
+                <input type="submit" name="navigateToOrganizations" value="Organizations">
+            </form>
+            <form method="GET" action="Players.php">
+                <input type="submit" name="navigateToPlayers" value="Players">
+            </form>
+        </div>
+        <br /><hr />
     </div>
+    <h1 class="pageTitle">Organizations</h1>
     <h2>Leading Region</h2>
         <form method="GET" action="Organizations.php">
             <input type="hidden" id="regionAvgWinRate" name="regionAvgWinRate">
@@ -38,7 +45,7 @@
             New Winrate: <input type="text" name="upd_wr"> <br /><br />            
             <input type="submit" value="Update" name="updateSubmit"></p>
         </form>
-    <h2>Show Teams</h2>
+    <h2>List of Teams</h2>
     <form method="GET" action="Organizations.php">
         <input type="hidden" id="showOrgTableRequest" name="showOrgTableRequest">
         <input type="submit" name="showOrgTableRequest" value="Show"></p>
@@ -122,7 +129,7 @@
         function handleShowOrgTableRequest() {
             $result = executePlainSQL("SELECT * FROM Organization");
 
-            echo "<table>";
+            echo "<table class='orgList'>";
             echo "
                 <tr>
                     <th>Name</th>

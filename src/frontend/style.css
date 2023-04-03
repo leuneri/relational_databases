@@ -3,5 +3,32 @@ body {
 }
 
 .topMenu {
-    margin-bottom: 64;
+    overflow: hidden;
+    margin-bottom: 32px;
+}
+
+.topMenu form {
+    float: left;
+    text-align: center;
+}
+
+.topMenu br {
+    margin: 5px;
+}
+
+.pageTitle {
+    margin-bottom: 5px;
+    text-decoration: underline;
+}
+
+.orgList {
+    width: 600px;
+}
+
+.orgList tr {
+    text-align: center;
+}
+
+.orgList tr:nth-child(even) {
+    background-color: rgb(199, 228, 252);
 }
