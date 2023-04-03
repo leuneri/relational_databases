@@ -31,8 +31,13 @@
             New Winrate: <input type="text" name="upd_wr"> <br /><br />            
             <input type="submit" value="Update" name="updateSubmit"></p>
         </form>
-	<?php
-		//this tells the system that it's no longer just parsing html; it's now parsing PHP
+    <h2>Show Teams</h2>
+    <form method="GET" action="Organizations.php">
+        <input type="hidden" id="showOrgTableRequest" name="showOrgTableRequest">
+        <input type="submit" name="showOrgTableRequest" value="Show"></p>
+    </form>
+
+	<?php	//this tells the system that it's no longer just parsing html; it's now parsing PHP
 
         $success = True; //keep track of errors so it redirects the page only if there are no errors
         $db_conn = NULL; // edit the login credentials in connectToDB()
@@ -107,22 +112,29 @@
         }
 
         //TODO CHRIS: show the table goodluck with formatting
-        function handleShowOrgTable($result) { //prints results from a select statement
+        function handleShowOrgTableRequest() {
+            $result = executePlainSQL("SELECT * FROM Organization");
 
-            global $db_conn;
+            echo "<table>";
+            echo "
+                <tr>
+                    <th>Name</th>
+                    <th>Ranking</th>
+                    <th>Region</th>
+                    <th>Win Rate</th>
+                </tr>";
 
-            // $result = executePlainSQL("SELECT * FROM Organization");
-            // showOrgTable($result)
-            
-            // echo "<br>Retrieved data from table Organization:<br>";
-            // echo "<table>";
-            // echo "<tr><th>Name</th><th>Ranking</th></tr>Region</th></tr>Win Rate";
+            while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+                echo "
+                    <tr>
+                        <td>" . $row["NAME"] . "</td>
+                        <td>" . $row["RANKING"] . "</td>
+                        <td>" . $row["REGION"] . "</td>
+                        <td>" . $row["WIN_RATE"] . "</td>
+                    </tr>";
 
-            // while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-            //     echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td></tr>" . $row["region"] . "</td></tr>" $row["win_rate"]; //or just use "echo $row[0]"
-            // }
-
-            // echo "</table>";
+            }
+            echo "</table>";
         }
 
         function showOrganizationParticipatingInTable($result) { //prints results from a select statement
@@ -279,9 +291,10 @@
             if (connectToDB()) {
                 if (array_key_exists('countTuples', $_GET)) {
                     handleCountRequest();
-                }
-                if (array_key_exists('regionAvgWinRate', $_GET)) {
+                } else if (array_key_exists('regionAvgWinRate', $_GET)) {
                     handleRegionAvgWinRate();
+                } else if (array_key_exists('showOrgTableRequest', $_GET)) {
+                    handleShowOrgTableRequest();
                 }
 
                 disconnectFromDB();
