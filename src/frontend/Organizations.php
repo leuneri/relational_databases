@@ -125,7 +125,7 @@
             }
         }
 
-        //TODO CHRIS: show the table goodluck with formatting
+        //TODO CHRIS: Show list of teams on page load (instead of after button is pressed)
         function handleShowOrgTableRequest() {
             $result = executePlainSQL("SELECT * FROM Organization");
 
