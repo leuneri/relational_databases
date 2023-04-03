@@ -46,10 +46,17 @@
             <input type="submit" value="Update" name="updateSubmit"></p>
         </form>
     <h2>List of Teams</h2>
-    <form method="GET" action="Organizations.php">
-        <input type="hidden" id="showOrgTableRequest" name="showOrgTableRequest">
-        <input type="submit" name="showOrgTableRequest" value="Show"></p>
+    <form method="GET" action="Organizations.php" id="orgListForm">
+        <input type="hidden" id="showOrgListRequest" name="showOrgListRequest">
+        <!-- <input type="submit" name="showOrgListRequest" value="Show"></p> -->
     </form>
+
+    <script>
+        window.onload = function() {
+            let orgListForm = document.getElementById("orgListForm");
+            orgListForm.submit();
+        };
+    </script>
 
 	<?php	//this tells the system that it's no longer just parsing html; it's now parsing PHP
 
@@ -126,7 +133,7 @@
         }
 
         //TODO CHRIS: Show list of teams on page load (instead of after button is pressed)
-        function handleShowOrgTableRequest() {
+        function handleShowOrgListRequest() {
             $result = executePlainSQL("SELECT * FROM Organization");
 
             echo "<table class='orgList'>";
@@ -144,7 +151,7 @@
                         <td>" . $row["NAME"] . "</td>
                         <td>" . $row["RANKING"] . "</td>
                         <td>" . $row["REGION"] . "</td>
-                        <td>" . $row["WIN_RATE"] . "</td>
+                        <td>" . $row["WIN_RATE"] * 100 . "%</td>
                     </tr>";
 
             }
@@ -307,8 +314,8 @@
                     handleCountRequest();
                 } else if (array_key_exists('regionAvgWinRate', $_GET)) {
                     handleRegionAvgWinRate();
-                } else if (array_key_exists('showOrgTableRequest', $_GET)) {
-                    handleShowOrgTableRequest();
+                } else if (array_key_exists('showOrgListRequest', $_GET)) {
+                    handleShowOrgListRequest();
                 }
 
                 disconnectFromDB();
