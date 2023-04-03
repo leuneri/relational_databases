@@ -12,6 +12,12 @@
             Winrate: <input type="text" name="ins_winrate"> <br /><br />
             <input type="submit" value="Insert" name="insertSubmit"></p>
         </form>
+    <h2>Delete an Organization</h2>
+        <form method="POST" action="Organizations.php"> <!--refresh page when submitted-->
+            <input type="hidden" id="deleteQueryRequest" name="deleteQueryRequest">
+            Organization to Delete Name: <input type="text" name="del_name"> <br /><br />
+            <input type="submit" value="Delete" name="deleteSubmit"></p>
+        </form>
     <h2>Update Organization Ranking</h2>
         <form method="POST" action="Organizations.php"> <!--refresh page when submitted-->
             <input type="hidden" id="updateQueryRequest" name="updateQueryRequest">
@@ -165,14 +171,27 @@
             OCICommit($db_conn);
         }
 
-        function handleResetRequest() {
+        function handleDeleteRequest() {
             global $db_conn;
-            // Drop old table
-            executePlainSQL("DROP TABLE demoTable");
 
-            // Create new table
-            echo "<br> creating new table <br>";
-            executePlainSQL("CREATE TABLE demoTable (id int PRIMARY KEY, name char(30))");
+            //Getting the values from user
+            $tuple = array (
+                ":bind1" => $_POST['del_name'],
+            );
+
+            $alltuples = array (
+                $tuple
+            );
+
+            $result = executePlainSQL("SELECT OID.o_id 
+                FROM OrganizationID OID, Organization O
+                WHERE OID.name = O.name AND O.name = '" . $_POST['del_name'] ."'" );
+            
+            $row = oci_fetch_row($result);
+            $oid = $row[0];
+            executePlainSQL("DELETE FROM Organization WHERE name = '" . $_POST['del_name'] ."'" );
+            executePlainSQL("DELETE FROM OrganizationID WHERE o_id = '" . $oid ."'" );
+
             OCICommit($db_conn);
         }
 
@@ -192,6 +211,21 @@
             );
 
             executeBoundSQL("insert into Organization values (:bind1, :bind2, :bind3, :bind4)", $alltuples);
+            
+            //now create an org ID and insert into OrganizationID
+            $randomNumber = rand(10, 100000);
+
+            $tuple2 = array (
+                ":bind1" => $randomNumber,
+                ":bind2" => $_POST['ins_name'],
+            );
+
+            $alltuples2 = array (
+                $tuple2
+            );
+            executeBoundSQL("insert into OrganizationID values (:bind1, :bind2)", $alltuples2);
+            
+
             OCICommit($db_conn);
         }
 
@@ -209,8 +243,8 @@
 	// A better coding practice is to have one method that reroutes your requests accordingly. It will make it easier to add/remove functionality.
         function handlePOSTRequest() {
             if (connectToDB()) {
-                if (array_key_exists('resetTablesRequest', $_POST)) {
-                    handleResetRequest();
+                if (array_key_exists('deleteQueryRequest', $_POST)) {
+                    handleDeleteRequest();
                 } else if (array_key_exists('updateQueryRequest', $_POST)) {
                     handleUpdateRequest();
                 } else if (array_key_exists('insertQueryRequest', $_POST)) {
@@ -233,7 +267,7 @@
             }
         }
 
-		if (isset($_POST['reset']) || isset($_POST['updateSubmit']) || isset($_POST['insertSubmit'])) {
+		if (isset($_POST['deleteSubmit']) || isset($_POST['updateSubmit']) || isset($_POST['insertSubmit'])) {
             handlePOSTRequest();
         } else if (isset($_GET['countTupleRequest'])) {
             handleGETRequest();
