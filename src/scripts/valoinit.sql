@@ -80,6 +80,7 @@ CREATE TABLE TeamMemberContract (
 );
 grant select on TeamMemberContract to public;
 
+-- TODO: any issues here?
 -- CREATE TABLE Contract (
 -- 	start_date DATE,
 -- 	currently_active INTEGER,
@@ -108,6 +109,7 @@ CREATE TABLE Weapon (
 );
 grant select on Weapon to public;
 
+-- TODO: add kills 
 CREATE TABLE UsesWeapon (
 	tm_id INTEGER,
 	weapon_name CHAR(255),
@@ -197,6 +199,7 @@ CREATE TABLE Agent (
 );
 grant select on Agent to public;
 
+-- TODO: connect agentplayed table with avgCombatScore??
 CREATE TABLE AgentPlayed (
     tm_id INTEGER, 
     m_id INTEGER, 
@@ -205,6 +208,7 @@ CREATE TABLE AgentPlayed (
 );
 grant select on AgentPlayed to public;
 
+-- TODO: ER diagram says average damage per round, not number of rounds (num_rounds)
 CREATE TABLE AvgCombatScore (
     kills INTEGER, 
     deaths INTEGER, 
