@@ -2,33 +2,56 @@ body {
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.topMenu {
-    overflow: hidden;
+.navBar {
     margin-bottom: 32px;
 }
 
-.topMenu form {
+.navBar form {
     float: left;
     text-align: center;
 }
 
-.topMenu br {
+.navBar br {
     margin: 5px;
+    width: 100%;
+}
+
+.pageContent {
+    margin: auto;    
+    top: 100;
+    left: 0;
+    width: 98%;
 }
 
 .pageTitle {
     margin-bottom: 5px;
     text-decoration: underline;
+    width: 70%;
 }
 
-.orgList {
+.orgsDisplay {
+    width: 70%;
+}
+
+.orgsList {
+    display: block;
+    float: left;
+}
+
+.orgsListTable {
     width: 600px;
 }
 
-.orgList tr {
+.orgsListTable tr {
     text-align: center;
 }
 
-.orgList tr:nth-child(even) {
+.orgsListTable tr:nth-child(even) {
     background-color: rgb(199, 228, 252);
+}
+
+.editOrgsMenu {
+    float: right;
+    position: relative;  
+    width: 30%; 
 }

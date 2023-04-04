@@ -22,7 +22,7 @@
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
-        <div class="topMenu">
+        <div class="navBar">
             <h2>Navigation</h2>
             <form method="GET" action="Organizations.php">
                 <input type="submit" name="navigateToOrganizations" value="Organizations">
