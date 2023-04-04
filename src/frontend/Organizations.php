@@ -164,15 +164,15 @@
                 }
             }
 
-            function showOrganizationParticipatingInTable($result) { //prints results from a select statement
-                // echo "<center><h2>Here are your results!</h2></center>";
-                // echo "<table>";
-                // echo "<tr><th>Organization ID</th><th>Event ID</th></tr>";
+            function showOrganizationTable($result) { //prints results from a select statement
+                echo "<center><h2>Here are your results!</h2></center>";
+                echo "<table>";
+                echo "<tr><th>Organization ID</th><th>Win Rate</th></tr>";
             
-                // while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-                //     echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td><tr>";
-                // }
-                // echo "</table>";
+                while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+                    echo "<tr><td>" . $row[0] . "</td><td>" . $row[3] . "</td><tr>";
+                }
+                echo "</table>";
                 
             }
 
@@ -203,15 +203,14 @@
 
             function handleUpdateRequest() {
                 global $db_conn;
-                $upd_org_name = $_POST['upd_org_name'];
+                $org_name = $_POST['org_name'];
                 $upd_wr = $_POST['upd_wr'];
-                //TODO ERIC: get o_id, then update request
                 $result = executePlainSQL("
-                    UPDATE ParticipatingIn
-                    SET o_id ='" . $new_oid . "', e_id ='" . $new_eid . "'
-                    WHERE od_id ='" . $current_oid . "' , e_id ='" . $current_eid . "';    
+                    UPDATE Organization
+                    SET win_rate ='" . $upd_wr . "'
+                    WHERE name ='" . $org_name . "';    
                 ");
-                showOrganizationParticipatingInTable($result);
+                showOrganizationTable($result);
                 OCICommit($db_conn);
             }
 
