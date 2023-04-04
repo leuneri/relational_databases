@@ -36,8 +36,7 @@
                 <h2>Update Organization Ranking</h2>
                 <form method="POST" action="Organizations.php"> <!--refresh page when submitted-->
                     <input type="hidden" id="updateQueryRequest" name="updateQueryRequest">
-                    Organization: <input type="text" name="upd_org_name"> <br /><br />
-                    <!--TODO Eric: change entered name-> O_id to be used in query-->
+                    Organization: <input type="text" name="org_name"> <br /><br />
                     New Winrate: <input type="text" name="upd_wr"> <br /><br />            
                     <input type="submit" value="Update" name="updateSubmit"></p>
                 </form>
