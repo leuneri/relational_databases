@@ -54,7 +54,7 @@
                     <h2>List of Teams</h2>
                     <form method="POST" action="Organizations.php">
                         <input type="hidden" id="filterSubmitRequest" name="filterSubmitRequest">
-                        Filter conditions: <input type="text" name="queryText">
+                        Filter conditions: <input type="text" placeholder="e.g. region='Americas'" name="queryText">
                         <input type="submit" value="Enter" name="filterSubmit">
                     </form>
                     <?php
