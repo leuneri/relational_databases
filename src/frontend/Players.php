@@ -33,11 +33,16 @@
             <br /><hr />
         </div>
         <h1 class="pageTitle">Players</h1>
-        <h2>Get the average damage per round across all weapons</h2>
-        <form method="GET" action="Players.php"> <!--refresh page when submitted-->
-            <input type="hidden" id="dmg_allweapons" name="dmg_allweapons">
-            <input type="submit" name="dmg_allweapons"></p>
-        </form>
+        <div class="dmgAllWeaponsList">
+            <h2>Average damage per round (ADR) for all players</h2>
+            <!-- <form method="GET" action="Players.php">
+                <input type="hidden" id="dmg_allWeapons" name="dmg_allWeapons">
+                <input type="submit" name="dmg_allWeapons"></p>
+            </form> -->
+            <?php
+                handleAvgDmgAllWeapons();
+            ?>
+        </div>
 
         <hr />
 
@@ -218,22 +223,32 @@
         }
 
         function handleAvgDmgAllWeapons() {
-            global $db_conn;
-            if (array_key_exists('dmg_allweapons', $_GET)) {
+            if (connectToDB()) {
                 $result = executePlainSQL("SELECT TMC.in_game_name, AVG(UW.average_damage_per_round) 
                 FROM TeamMemberContract TMC 
                 JOIN UsesWeapon UW ON TMC.tm_id = UW.tm_id 
                 GROUP BY TMC.in_game_name");
                 showDmgTable($result);
-                OCICommit($db_conn);
             }
         }
 
         //TODO CHRIS
         function showDmgTable($result){
+            echo "
+                <table class='playerDmgTable'>
+                    <tr>
+                        <th>Player</th>
+                        <th>ADR</th>
+                    </tr>";
+
             while (($row = oci_fetch_row($result)) != false) {
-                echo "<br> The dmg_allweapons: " . $row[0] . $row[1] ."<br>";
+                echo "
+                    <tr>
+                        <td><i>".$row[0]."</i></td>
+                        <td>".round($row[1], 1)."</td>
+                    </tr>";
             }
+            echo "</table>";
         }
 
         function handleHighestKills(){
@@ -312,11 +327,11 @@
 	// A better coding practice is to have one method that reroutes your requests accordingly. It will make it easier to add/remove functionality.
         function handleGETRequest() {
             if (connectToDB()) {
-                if (array_key_exists('dmg_allweapons', $_GET)) {
+                if (array_key_exists('dmg_allWeapons', $_GET)) {
                     handleAvgDmgAllWeapons();
                 } else if (array_key_exists('highestkills', $_GET)) {
                     handleHighestKills();
-                }
+                } 
                 disconnectFromDB();
             }
         }
