@@ -201,88 +201,12 @@
             } 
         }
 
-        // HANDLE ALL POST ROUTES
-        // A better coding practice is to have one method that reroutes your requests accordingly. It will make it easier to add/remove functionality.
-        // function handlePOSTRequest() {
-        //     if (connectToDB()) {
-        //         if (array_key_exists('queryRequest', $_POST)) {
-        //             createAttributeCheckboxes($_POST['selectRelation']);
-        //         }
-            
-        //         disconnectFromDB();
-        //     }
-        // }
-
-        // HANDLE ALL GET ROUTES
-        // A better coding practice is to have one method that reroutes your requests accordingly. It will make it easier to add/remove functionality.
-        // function handleGETRequest() {
-        //     if (connectToDB()) {
-        //         if (array_key_exists('', $_GET)) {
-
-        //         }
-            
-        //         disconnectFromDB();
-        //     }
-        // }
-
-        // if (isset($_POST[''])) {
-        //     handlePOSTRequest();
-        // } else {
-        //     handleGETRequest();
-        // }
-
         if (isset($_POST['selectRelation'])) {
-            // echo "<script type='text/javascript'>alert('" . $tableName . "');</script>";
             createAttributeCheckboxes($_POST['selectRelation']);
         }
 
         if (isset($_POST['selectAttributesRequest'])) {
             showSearchResults();
         }
-
-        // if (isset($_POST['table'])) {
-        //     echo "hehehe";
-        //     // if (connectToDB()) {
-        //     //     $result = executePlainSQL("SELECT * FROM " . $_GET['table']);
-        //     //     $nCols = oci_num_fields($result);
-
-        //     //     $array = array();
-
-        //     //     for ($i = 1; $i <= $nCols; $i++) {
-        //     //         $colName = oci_field_name($result, $i);
-        //     //         array_push($array, $colName);
-        //     //     }
-
-        //     //     disconnectFromDB();
-
-        //     //     echo json_encode($array);
-        //     // }
-        // }
     ?>
-    <script>
-        function changeTable(tableName) {
-            var attrDropdown = document.getElementById("selectAttribute");
-            while (attrDropdown.firstChild) {
-                attrDropdown.removeChild(attrDropdown.firstChild);
-            }
-            
-            if (tableName == "") {
-                return;
-            }
-
-            alert("Relation is " + tableName);
-
-            // $.post('Search.php', {'table' : tableName}, function(data) {
-            //     var jsonData = JSON.parse(data);
-            //     alert("Data received " + jsonData);
-            // });
-            
-            // $.post('Search.php', {'table' : tableName}, function(data) {
-            //     alert(data);
-            // });
-
-            // var xmlHttp = new XMLHttpRequest();
-            // xmlHttp.open("GET", "Search.php?")
-        }
-    </script>
 </html>
