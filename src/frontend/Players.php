@@ -275,22 +275,22 @@
         function handleCheckPlayersSameMatch(){
             global $db_conn;
             $player1 = $_POST['player1'];
-	$player2 = $_POST['player2'];
-		$result = executePlainSQL("SELECT DISTINCT ap1.m_id
-FROM AgentPlayed AS ap1
-INNER JOIN TeamMemberContract AS tmc1 ON tmc1.tm_id = ap1.tm_id
-WHERE tmc1.in_game_name = 'TenZ'
-AND NOT EXISTS (
-    SELECT *
-    FROM TeamMemberContract AS tmc2
-    WHERE tmc2.in_game_name = 'aspas'
-    AND NOT EXISTS (
-        SELECT *
-        FROM AgentPlayed AS ap2
-        WHERE ap2.m_id = ap1.m_id
-        AND ap2.tm_id = tmc2.tm_id
-    )
-)")
+	        $player2 = $_POST['player2'];
+		    $result = executePlainSQL("SELECT DISTINCT ap1.m_id
+                FROM AgentPlayed AS ap1
+                INNER JOIN TeamMemberContract AS tmc1 ON tmc1.tm_id = ap1.tm_id
+                WHERE tmc1.in_game_name = 'TenZ'
+                AND NOT EXISTS (
+                    SELECT *
+                    FROM TeamMemberContract AS tmc2
+                    WHERE tmc2.in_game_name = 'aspas'
+                    AND NOT EXISTS (
+                        SELECT *
+                        FROM AgentPlayed AS ap2
+                        WHERE ap2.m_id = ap1.m_id
+                        AND ap2.tm_id = tmc2.tm_id
+                    )
+                )");
             showSameMatchTable($player1, $player2, $result);
         }
 
