@@ -169,45 +169,6 @@
             OCILogoff($db_conn);
         }
 
-        function handleUpdateRequest() {
-            global $db_conn;
-
-            $old_name = $_POST['oldName'];
-            $new_name = $_POST['newName'];
-
-            // you need the wrap the old name and new name values with single quotations
-            executePlainSQL("UPDATE demoTable SET name='" . $new_name . "' WHERE name='" . $old_name . "'");
-            OCICommit($db_conn);
-        }
-
-        function handleResetRequest() {
-            global $db_conn;
-            // Drop old table
-            executePlainSQL("DROP TABLE demoTable");
-
-            // Create new table
-            echo "<br> creating new table <br>";
-            executePlainSQL("CREATE TABLE demoTable (id int PRIMARY KEY, name char(30))");
-            OCICommit($db_conn);
-        }
-
-        function handleInsertRequest() {
-            global $db_conn;
-
-            //Getting the values from user and insert data into the table
-            $tuple = array (
-                ":bind1" => $_POST['insNo'],
-                ":bind2" => $_POST['insName']
-            );
-
-            $alltuples = array (
-                $tuple
-            );
-
-            executeBoundSQL("insert into demoTable values (:bind1, :bind2)", $alltuples);
-            OCICommit($db_conn);
-        }
-
         function handleAvgDmgAllWeapons() {
             if (connectToDB()) {
                 $result = executePlainSQL("SELECT TMC.in_game_name, AVG(UW.average_damage_per_round) 
@@ -282,11 +243,11 @@
 		    $result = executePlainSQL("SELECT DISTINCT ap1.m_id
                 FROM AgentPlayed ap1
                 INNER JOIN TeamMemberContract tmc1 ON tmc1.tm_id = ap1.tm_id
-                WHERE tmc1.in_game_name = '" . $player1 . "'
+                WHERE tmc1.in_game_name = 'TenZ'
                 AND NOT EXISTS (
                     SELECT *
                     FROM TeamMemberContract tmc2
-                    WHERE tmc2.in_game_name = '" . $player2 . "'
+                    WHERE tmc2.in_game_name = 'aspas'
                     AND NOT EXISTS (
                         SELECT *
                         FROM AgentPlayed ap2
@@ -300,22 +261,27 @@
         //TODO CHRIS: 
         function showSameMatchTable($player1, $player2, $result) {
             echo "<h2>Matches ".$player1." and ".$player2." have played together</h2>";
-            echo "<table>";
+            echo "<table class='sameMatchTable'>";
             echo "
                 <tr>
-                    <th>Match ID</th>
+                    <th>Date</th>
+                    <th>Event</th>
+                    <th>Winning Team</th>
+                    <th>Map</th>
                 </tr>";
 
-            while ($row = OCI_Fetch_Array($result)) {
+            while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
                 echo "
                 <tr>
-                    <td>".$row[0]."</td>
+                    <td>".$row["GAME_DATE"]."</td>
+                    <td>".$row["EVENT_NAME"]."</td>
+                    <td>".$row["NAME"]."</td>
+                    <td>".$row["MAP_NAME"]."</td>
                 </tr";
             }
 
             echo "</table>";
         }
-
 
         // HANDLE ALL POST ROUTES
 	// A better coding practice is to have one method that reroutes your requests accordingly. It will make it easier to add/remove functionality.
