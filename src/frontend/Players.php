@@ -1,4 +1,4 @@
-  <html>
+<html>
     <head>
         <title>VCT STATS - Players</title>
         <link rel="stylesheet" href="style.css">
@@ -280,16 +280,16 @@
             $player1 = $_POST['player1'];
 	        $player2 = $_POST['player2'];
 		    $result = executePlainSQL("SELECT DISTINCT ap1.m_id
-                FROM AgentPlayed AS ap1
-                INNER JOIN TeamMemberContract AS tmc1 ON tmc1.tm_id = ap1.tm_id
-                WHERE tmc1.in_game_name = 'TenZ'
+                FROM AgentPlayed ap1
+                INNER JOIN TeamMemberContract tmc1 ON tmc1.tm_id = ap1.tm_id
+                WHERE tmc1.in_game_name = '" . $player1 . "'
                 AND NOT EXISTS (
                     SELECT *
-                    FROM TeamMemberContract AS tmc2
-                    WHERE tmc2.in_game_name = 'aspas'
+                    FROM TeamMemberContract tmc2
+                    WHERE tmc2.in_game_name = '" . $player2 . "'
                     AND NOT EXISTS (
                         SELECT *
-                        FROM AgentPlayed AS ap2
+                        FROM AgentPlayed ap2
                         WHERE ap2.m_id = ap1.m_id
                         AND ap2.tm_id = tmc2.tm_id
                     )
@@ -300,27 +300,22 @@
         //TODO CHRIS: 
         function showSameMatchTable($player1, $player2, $result) {
             echo "<h2>Matches ".$player1." and ".$player2." have played together</h2>";
-            echo "<table class='sameMatchTable'>";
+            echo "<table>";
             echo "
                 <tr>
-                    <th>Date</th>
-                    <th>Event</th>
-                    <th>Winning Team</th>
-                    <th>Map</th>
+                    <th>Match ID</th>
                 </tr>";
 
-            while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+            while ($row = OCI_Fetch_Array($result)) {
                 echo "
                 <tr>
-                    <td>".$row["GAME_DATE"]."</td>
-                    <td>".$row["EVENT_NAME"]."</td>
-                    <td>".$row["NAME"]."</td>
-                    <td>".$row["MAP_NAME"]."</td>
+                    <td>".$row[0]."</td>
                 </tr";
             }
 
             echo "</table>";
         }
+
 
         // HANDLE ALL POST ROUTES
 	// A better coding practice is to have one method that reroutes your requests accordingly. It will make it easier to add/remove functionality.
