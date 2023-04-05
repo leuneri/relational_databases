@@ -258,27 +258,23 @@
             showSameMatchTable($player1, $player2, $result);
         }
 
-        //TODO CHRIS: 
         function showSameMatchTable($player1, $player2, $result) {
             echo "<h2>Matches ".$player1." and ".$player2." have played together</h2>";
-            echo "<table class='sameMatchTable'>";
+            echo "<table>";
             echo "
                 <tr>
-                    <th>Date</th>
-                    <th>Event</th>
-                    <th>Winning Team</th>
-                    <th>Map</th>
+                    <th>Match ID</th>
                 </tr>";
 
-            while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+            while ($row = OCI_Fetch_Array($result)) {
                 echo "
                 <tr>
-                    <td>".$row["GAME_DATE"]."</td>
-                    <td>".$row["EVENT_NAME"]."</td>
-                    <td>".$row["NAME"]."</td>
-                    <td>".$row["MAP_NAME"]."</td>
+                    <td>".$row[0]."</td>
                 </tr";
             }
+
+            echo "</table>";
+        }
 
             echo "</table>";
         }
