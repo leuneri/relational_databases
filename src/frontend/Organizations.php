@@ -200,11 +200,7 @@
                 global $db_conn;
                 $org_name = $_POST['org_name'];
                 $upd_wr = $_POST['upd_wr'];
-                $result = executePlainSQL("
-                    UPDATE Organization
-                    SET win_rate ='" . $upd_wr . "'
-                    WHERE name ='" . $org_name . "';    
-                ");
+                $result = executePlainSQL("UPDATE Organization SET win_rate='".$upd_wr."' WHERE name='".$org_name."'");
                 showOrganizationTable($result);
                 OCICommit($db_conn);
             }
