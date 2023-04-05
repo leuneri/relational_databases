@@ -280,7 +280,7 @@
             echo "<tr><th>In-game Name</th><th>Number of Kills</th></tr>";
 
             while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-                echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td><tr>";
+                echo "<tr><td>" . $row[0] . "</td><td>" . $row[3] . "</td><tr>";
             }
             echo "</table>";
         }
