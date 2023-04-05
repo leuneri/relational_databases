@@ -6,14 +6,15 @@
     <body>
         <div class="navBar">
             <h2>Navigation</h2>
-            <div class="menuButtons">
-                <form method="GET" action="Organizations.php">
-                    <input type="submit" name="navigateToOrganizations" value="Organizations">
-                </form>
-                <form method="GET" action="Players.php">
-                    <input type="submit" name="navigateToPlayers" value="Players">
-                </form>
-            </div>
+            <form method="GET" action="Search.php">
+                <input type="submit" value="Search">
+            </form>
+            <form method="GET" action="Organizations.php">
+                <input type="submit" value="Organizations">
+            </form>
+            <form method="GET" action="Players.php">
+                <input type="submit" value="Players">
+            </form>
             <br /><hr />
         </div>
         <div class="pageContent">
@@ -62,7 +63,6 @@
             $success = True; //keep track of errors so it redirects the page only if there are no errors
             $db_conn = NULL; // edit the login credentials in connectToDB()
             $show_debug_alert_messages = False; // set to True if you want alerts to show you which methods are being triggered (see how it is used in debugAlertMessage())
-            $yo = "heyo";
 
             function debugAlertMessage($message) {
                 global $show_debug_alert_messages;
@@ -156,6 +156,8 @@
                             </tr>";
                     }
                     echo "</table>";
+
+                    disconnectFromDB();
                 }
             }
 
@@ -282,6 +284,8 @@
                     if (($row = oci_fetch_row($result)) != false) {
                         echo "<p>The top region is <b><i>" . $row[0] . "</i></b></p>";
                     }
+
+                    disconnectFromDB();
                 }
             }
 

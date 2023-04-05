@@ -4,13 +4,16 @@
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
-        <div class="navBar">
+    <div class="navBar">
             <h2>Navigation</h2>
             <form method="GET" action="Organizations.php">
-                <input type="submit" name="navigateToOrganizations" value="Organizations">
+                <input type="submit" value="Search">
+            </form>
+            <form method="GET" action="Organizations.php">
+                <input type="submit" value="Organizations">
             </form>
             <form method="GET" action="Players.php">
-                <input type="submit" name="navigateToPlayers" value="Players">
+                <input type="submit" value="Players">
             </form>
             <br /><hr />
         </div>
