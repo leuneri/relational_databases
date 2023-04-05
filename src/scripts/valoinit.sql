@@ -1,5 +1,4 @@
 DROP TABLE AgentPlayed;
-DROP TABLE AvgCombatScore;
 DROP TABLE MapPlayed;
 DROP TABLE MapPicks;
 DROP TABLE Matchup;
@@ -9,7 +8,6 @@ DROP TABLE SeriesInEvent;
 DROP TABLE StagedEvent;
 DROP TABLE OnlineEvent;
 DROP TABLE ParticipatingIn;
--- DROP TABLE Contract;
 DROP TABLE Coach;
 DROP TABLE Player;
 DROP TABLE HistoricalMatchup;
@@ -80,14 +78,6 @@ CREATE TABLE TeamMemberContract (
 );
 grant select on TeamMemberContract to public;
 
--- TODO: any issues here?
--- CREATE TABLE Contract (
--- 	start_date DATE,
--- 	currently_active INTEGER,
--- 	PRIMARY KEY (start_date)
--- );
--- grant select on Contract to public;
-
 CREATE TABLE Coach (
 	tm_id INTEGER PRIMARY KEY,
 	FOREIGN KEY (tm_id) REFERENCES TeamMemberContract (tm_id) ON DELETE CASCADE
@@ -114,6 +104,7 @@ CREATE TABLE UsesWeapon (
 	tm_id INTEGER,
 	weapon_name CHAR(255),
 	average_damage_per_round REAL,
+	kills REAL,
 	headshot_percentage REAL,
 	PRIMARY KEY (tm_id, weapon_name),
 	FOREIGN KEY (tm_id) REFERENCES TeamMemberContract (tm_id) ON DELETE CASCADE,
@@ -199,28 +190,13 @@ CREATE TABLE Agent (
 );
 grant select on Agent to public;
 
--- TODO: connect agentplayed table with avgCombatScore??
 CREATE TABLE AgentPlayed (
     tm_id INTEGER, 
     m_id INTEGER, 
     agent_number INTEGER,
     PRIMARY KEY (tm_id, m_id, agent_number)
 );
-grant select on AgentPlayed to public;
-
--- TODO: ER diagram says average damage per round, not number of rounds (num_rounds)
-CREATE TABLE AvgCombatScore (
-    kills INTEGER, 
-    deaths INTEGER, 
-    assists INTEGER, 
-    num_plants INTEGER, 
-    num_defuses INTEGER, 
-    num_rounds INTEGER, 
-    average_combat_score INTEGER,
-    PRIMARY KEY (kills, deaths, assists, num_plants, num_defuses, num_rounds)
-);
-grant select on AvgCombatScore to public;
- 
+grant select on AgentPlayed to public; 
 
 INSERT INTO OrganizationID VALUES(1, 'Sentinels');
 INSERT INTO OrganizationID VALUES(2, 'LOUD');
@@ -247,18 +223,6 @@ INSERT INTO TeamMemberContract VALUES(4, 'SyykoNT', 'Don Muir', DATE '2022-10-03
 INSERT INTO TeamMemberContract VALUES(5, 's0m', 'Sam Oh', DATE '2020-10-07', NULL, NULL, 5);
 INSERT INTO TeamMemberContract VALUES(6, 'f0rsakeN', 'Jason Susanto', DATE '2021-02-08', NULL, NULL, 4);
 
--- INSERT INTO Contract VALUES(DATE '2020-06-01', 1);
--- INSERT INTO Contract VALUES(DATE '2022-02-03', 1);
--- INSERT INTO Contract VALUES(DATE '2022-05-09', 0);
--- INSERT INTO Contract VALUES(DATE '2022-10-03', 1);
--- INSERT INTO Contract VALUES(DATE '2020-10-07', 1);
-
--- INSERT INTO Coach VALUES(4);
--- INSERT INTO Coach VALUES(7);
--- INSERT INTO Coach VALUES(8);
--- INSERT INTO Coach VALUES(9);
--- INSERT INTO Coach VALUES(10);
-
 INSERT INTO Player VALUES(1, 'Radiant #1', 'Duelist');
 INSERT INTO Player VALUES(2, 'Radiant #1', 'Duelist');
 INSERT INTO Player VALUES(3, 'Radiant #220', 'Initiator');
@@ -271,11 +235,11 @@ INSERT INTO Weapon VALUES('Vandal', 160);
 INSERT INTO Weapon VALUES('Classic', 78);
 INSERT INTO Weapon VALUES('Guardian', 195);
 
-INSERT INTO UsesWeapon VALUES(1, 'Vandal', 177.1, 0.361);
-INSERT INTO UsesWeapon VALUES(1, 'Marshal', 120.9, 0.247);
-INSERT INTO UsesWeapon VALUES(1, 'Classic', 28.3, 0.338);
-INSERT INTO UsesWeapon VALUES(2, 'Sheriff', 88.4, 0.561);
-INSERT INTO UsesWeapon VALUES(2, 'Vandal', 175.9, 0.458);
+INSERT INTO UsesWeapon VALUES(1, 'Vandal', 177.1, 483.0, 0.361);
+INSERT INTO UsesWeapon VALUES(1, 'Marshal', 120.9, 323.0, 0.247);
+INSERT INTO UsesWeapon VALUES(1, 'Classic', 28.3, 4545.0, 0.338);
+INSERT INTO UsesWeapon VALUES(2, 'Sheriff', 88.4, 444.0, 0.561);
+INSERT INTO UsesWeapon VALUES(2, 'Vandal', 175.9, 0.0, 0.458);
 
 INSERT INTO Event VALUES(1, 'VCT 2023: LOCK//IN São Paulo', DATE '2023-02-13', DATE '2023-03-04', NULL, 500000);
 INSERT INTO Event VALUES(2, 'VCT 2021: Stage 2 Masters - Reykjavík', DATE '2021-05-24', DATE '2021-05-30', 1, 600000);
@@ -350,9 +314,3 @@ INSERT INTO AgentPlayed VALUES(2, 1, 6);
 INSERT INTO AgentPlayed VALUES(2, 3, 1);
 INSERT INTO AgentPlayed VALUES(1, 3, 8);
 INSERT INTO AgentPlayed VALUES(2, 4, 3);
-
-INSERT INTO AvgCombatScore VALUES(20, 8, 8, 1, 5, 16, 346);
-INSERT INTO AvgCombatScore VALUES(15, 11, 10, 2, 3, 19, 217);
-INSERT INTO AvgCombatScore VALUES(32, 19, 6, 0, 2, 23, 395);
-INSERT INTO AvgCombatScore VALUES(28, 14, 4, 0, 1, 21, 348);
-INSERT INTO AvgCombatScore VALUES(25, 12, 7, 4, 1, 20, 359);
