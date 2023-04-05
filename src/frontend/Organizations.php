@@ -26,20 +26,20 @@
                     Ranking: <input type="text" name="ins_ranking"> <br /><br />
                     Region: <input type="text" name="ins_region"> <br /><br />
                     Winrate: <input type="text" name="ins_winrate"> <br /><br />
-                    <input type="submit" value="Insert" name="insertSubmit"></p>
+                    <input type="submit" value="Insert" name="insertSubmit">
                 </form>
                 <h2>Delete an Organization</h2>
                 <form method="POST" action="Organizations.php"> <!--refresh page when submitted-->
                     <input type="hidden" id="deleteQueryRequest" name="deleteQueryRequest">
                     Organization to Delete Name: <input type="text" name="del_name"> <br /><br />
-                    <input type="submit" value="Delete" name="deleteSubmit"></p>
+                    <input type="submit" value="Delete" name="deleteSubmit">
                 </form>
                 <h2>Update Organization Ranking</h2>
                 <form method="POST" action="Organizations.php"> <!--refresh page when submitted-->
                     <input type="hidden" id="updateQueryRequest" name="updateQueryRequest">
                     Organization: <input type="text" name="org_name"> <br /><br />
                     New Winrate: <input type="text" name="upd_wr"> <br /><br />            
-                    <input type="submit" value="Update" name="updateSubmit"></p>
+                    <input type="submit" value="Update" name="updateSubmit">
                 </form>
             </div>
             <h1 class="pageTitle">Organizations</h1>
@@ -52,6 +52,11 @@
                 </div>
                 <div class="orgsList">
                     <h2>List of Teams</h2>
+                    <form method="POST" action="Organizations.php">
+                        <input type="hidden" id="filterSubmitRequest" name="filterSubmitRequest">
+                        Filter conditions: <input type="text" name="queryText">
+                        <input type="submit" value="Enter" name="filterSubmit">
+                    </form>
                     <?php
                         showOrgList();
                     ?>
@@ -132,9 +137,8 @@
                 }
             }
 
-            //TODO CHRIS: Show list of teams on page load (instead of after button is pressed)
             function showOrgList() {
-                if (connectToDB()) {
+                if (connectToDB() && ($_POST['queryText'] == "")) {
                     $result = executePlainSQL("SELECT * FROM Organization");
             
                     echo "<table class='orgsListTable'>";
@@ -289,6 +293,34 @@
                 }
             }
 
+            function handleFilterSubmit() {
+                if ($_POST['queryText'] == "") {
+                    return;
+                }
+
+                $result = executePlainSQL("SELECT * FROM Organization WHERE " . $_POST['queryText']);
+
+                echo "<br><br><br><br><br><br><table class='orgsListTable'>";
+                echo "
+                        <tr>
+                            <th>Name</th>
+                            <th>Ranking</th>
+                            <th>Region</th>
+                            <th>Win Rate</th>
+                        </tr>";
+
+                while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+                    echo "
+                        <tr>
+                            <td>" . $row["NAME"] . "</td>
+                            <td>" . $row["RANKING"] . "</td>
+                            <td>" . $row["REGION"] . "</td>
+                            <td>" . $row["WIN_RATE"] * 100 . "%</td>
+                        </tr>";
+                }
+                echo "</table>";
+            }
+
             // HANDLE ALL POST ROUTES
             // A better coding practice is to have one method that reroutes your requests accordingly. It will make it easier to add/remove functionality.
             function handlePOSTRequest() {
@@ -299,6 +331,8 @@
                         handleUpdateRequest();
                     } else if (array_key_exists('insertQueryRequest', $_POST)) {
                         handleInsertRequest();
+                    } else if (array_key_exists('filterSubmitRequest', $_POST)) {
+                        handleFilterSubmit(); 
                     }
                 
                     disconnectFromDB();
@@ -317,7 +351,7 @@
                 }
             }
 
-            if (isset($_POST['deleteSubmit']) || isset($_POST['updateSubmit']) || isset($_POST['insertSubmit'])) {
+            if (isset($_POST['deleteSubmit']) || isset($_POST['updateSubmit']) || isset($_POST['insertSubmit']) || isset($_POST['filterSubmit'])) {
                 handlePOSTRequest();
             } else {
                 handleGETRequest();
