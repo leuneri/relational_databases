@@ -289,28 +289,90 @@
             global $db_conn;
             $player1 = $_POST['player1'];
 			$player2 = $_POST['player2'];
-            //TODO ERIC: also missing right parenthesis
-            $result = executePlainSQL("
-				SELECT DISTINCT m_id
-				FROM (
-					SELECT ap1.tm_id AS player1_tm_id, ap2.tm_id AS player2_tm_id, ap1.m_id
-					FROM AgentPlayed AS ap1
-					INNER JOIN AgentPlayed AS ap2 
-					ON ap1.m_id = ap2.m_id),
-				TeamMemberContract AS tmc1,
-				TeamMemberContract AS tmc2
-				WHERE tmc1.in_game_name ='" . $player1 . "' AND tmc2.in_game_name='" . $player2 . "' 
-				AND tmc1.tm_id = player1_tm_id
-				AND tmc2.tm_id = player2_tm_id");
-            $row = oci_fetch_row($result);
-            echo $row;
-            //sameMatchTable($result);
-			OCICommit($db_conn);
+
+            executePlainSQL("CREATE VIEW ap1 AS SELECT tm_id, m_id
+                FROM AgentPlayed");
+            executePlainSQL("CREATE VIEW ap2 AS SELECT tm_id, m_id
+                FROM AgentPlayed");
+            executePlainSQL("CREATE VIEW pair AS SELECT ap1.tm_id AS player1_tm_id, ap2.tm_id AS player2_tm_id, ap1.m_id
+                FROM ap1
+                INNER JOIN ap2 
+                ON ap1.m_id=ap2.m_id");
+
+            executePlainSQL("CREATE VIEW join1 AS SELECT player1_tm_id, player2_tm_id, in_game_name AS player1_name, m_id
+                FROM pair
+                INNER JOIN TeamMemberContract
+                ON player1_tm_id=tm_id
+                WHERE player1_tm_id<>player2_tm_id");
+
+            executePlainSQL("CREATE VIEW join2 AS SELECT player1_name, in_game_name AS player2_name, m_id
+                FROM join1
+                INNER JOIN TeamMemberContract
+                ON player2_tm_id=TeamMemberContract.tm_id");
+
+            executePlainSQL("CREATE VIEW join3 AS SELECT player1_name, player2_name, join2.m_id, s_id
+                FROM join2
+                INNER JOIN MatchInSeries
+                ON join2.m_id=MatchInSeries.m_id
+                WHERE player1_name='".$player1."' AND player2_name='".$player2."'");
+
+            executePlainSQL("CREATE VIEW join4 AS SELECT m_id, join3.s_id, e_id, game_date, winning_organization
+                FROM join3
+                INNER JOIN SeriesInEvent
+                ON join3.s_id=SeriesInEvent.s_id");
+            
+            executePlainSQL("CREATE VIEW join5 AS SELECT m_id, s_id, join4.e_id, game_date, join4.winning_organization, name AS event_name
+                FROM join4
+                INNER JOIN Event
+                ON join4.e_id=Event.e_id");
+
+            executePlainSQL("CREATE VIEW join6 AS SELECT join5.m_id, s_id, e_id, game_date, winning_organization, event_name, map_name
+                FROM join5
+                INNER JOIN MapPlayed
+                ON join5.m_id=MapPlayed.m_id");
+            
+            $result = executePlainSQL("SELECT *
+                FROM join6
+                INNER JOIN OrganizationID
+                ON winning_organization=o_id");
+
+            executePlainSQL("DROP VIEW ap1");
+            executePlainSQL("DROP VIEW ap2");
+            executePlainSQL("DROP VIEW pair");
+            executePlainSQL("DROP VIEW join1");
+            executePlainSQL("DROP VIEW join2");
+            executePlainSQL("DROP VIEW join3");
+            executePlainSQL("DROP VIEW join4");
+            executePlainSQL("DROP VIEW join5");
+            executePlainSQL("DROP VIEW join6");
+
+            showSameMatchTable($player1, $player2, $result);
         }
 
         //TODO CHRIS: 
-        // function sameMatchTable($result){
-        // }
+        function showSameMatchTable($player1, $player2, $result) {
+            echo "<h2>Matches ".$player1." and ".$player2." have played together</h2>";
+            echo "<table class='sameMatchTable'>";
+            echo "
+                <tr>
+                    <th>Date</th>
+                    <th>Event</th>
+                    <th>Winning Team</th>
+                    <th>Map</th>
+                </tr>";
+
+            while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+                echo "
+                <tr>
+                    <td>".$row["GAME_DATE"]."</td>
+                    <td>".$row["EVENT_NAME"]."</td>
+                    <td>".$row["NAME"]."</td>
+                    <td>".$row["MAP_NAME"]."</td>
+                </tr";
+            }
+
+            echo "</table>";
+        }
 
         // HANDLE ALL POST ROUTES
 	// A better coding practice is to have one method that reroutes your requests accordingly. It will make it easier to add/remove functionality.

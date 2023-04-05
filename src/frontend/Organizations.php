@@ -51,10 +51,6 @@
                 </div>
                 <div class="orgsList">
                     <h2>List of Teams</h2>
-                    <!-- <form method="GET" action="Organizations.php" id="orgsListForm">
-                        <input type="hidden" id="showOrgsListRequest" name="showOrgsListRequest">
-                        <input type="submit" name="showOrgsListRequest" value="Show"></p>
-                    </form> -->
                     <?php
                         showOrgList();
                     ?>
