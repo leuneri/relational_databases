@@ -1,11 +1,11 @@
 <html>
     <head>
-        <title>Search</title>
+        <title>VCT STATS - Search</title>
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
         <div class="navBar">
-            <h2>Navigation</h2>
+            <h1>VCT STATS</h1>
             <form method="GET" action="Search.php">
                 <input type="submit" value="Search">
             </form>

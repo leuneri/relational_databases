@@ -1,11 +1,11 @@
   <html>
     <head>
-        <title>Players</title>
+        <title>VCT STATS - Players</title>
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
     <div class="navBar">
-            <h2>Navigation</h2>
+            <h1>VCT STATS</h1>
             <form method="GET" action="Organizations.php">
                 <input type="submit" value="Search">
             </form>

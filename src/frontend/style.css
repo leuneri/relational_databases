@@ -1,5 +1,7 @@
 body {
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #0F1923;
+    color: #ECE8E1;
 }
 
 .navBar {
@@ -9,6 +11,13 @@ body {
 .navBar form {
     float: left;
     text-align: center;
+    margin-left: 10px;
+    margin-right: 10px;
+    
+}
+
+.navBar input {
+    border-radius: 0px;
 }
 
 .navBar br {
@@ -46,8 +55,8 @@ body {
     text-align: center;
 }
 
-.orgsListTable tr:nth-child(even) {
-    background-color: rgb(199, 228, 252);
+tr:nth-child(even) {
+    background-color: #FF4655;
 }
 
 .editOrgsMenu {
@@ -64,16 +73,8 @@ body {
     text-align: center;
 }
 
-.playerDmgTable tr:nth-child(even) {
-    background-color: rgb(199, 228, 252);
-}
-
 .sameMatchTable {
     width: 800px;
-}
-
-.sameMatchTable tr:nth-child(even) {
-    background-color: rgb(199, 228, 252);
 }
 
 .viewRelationFilter {
@@ -97,8 +98,4 @@ body {
 .searchResults {
     margin: auto;
     width: 50%;
-}
-
-.searchResults tr:nth-child(even) {
-    background-color: rgb(199, 228, 252);
 }
