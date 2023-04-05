@@ -1,21 +1,3 @@
-<!--Test Oracle file for UBC CPSC304 2018 Winter Term 1
-  Created by Jiemin Zhang
-  Modified by Simona Radu
-  Modified by Jessica Wong (2018-06-22)
-  This file shows the very basics of how to execute PHP commands
-  on Oracle.
-  Specifically, it will drop a table, create a table, insert values
-  update values, and then query for values
-
-  IF YOU HAVE A TABLE CALLED "demoTable" IT WILL BE DESTROYED
-
-  The script assumes you already have a server set up
-  All OCI commands are commands to the Oracle libraries
-  To get the file to work, you must place it somewhere where your
-  Apache server can run it, and you must rename it to have a ".php"
-  extension.  You must also change the username and password on the
-  OCILogon below to be your ORACLE username and password -->
-
   <html>
     <head>
         <title>Players</title>
@@ -46,10 +28,11 @@
 
         <hr />
 
-        <h2>Finds player in-game name with the highest kills in stats so far</h2>
-        <form method="GET" action="Players.php"> <!--refresh page when submitted-->
-            <input type="hidden" id="highestkills" name="highestkills">
-            <input type="submit" name="highestkills"></p>
+        <h2>Finds player in-game name with kills above a threshold</h2>
+        <form method="POST" action="Players.php"> <!--refresh page when submitted-->
+            <input type="hidden" id="PlayerAboveKillsThresholdRequest" name="PlayerAboveKillsThresholdRequest">
+            Threshold value: <input type="text" name="kills_above"> <br /><br />
+            <input type="submit" name="playerAboveKillsThresholdSubmit"></p>
         </form>
         <h2>Checks if two players have played in the same match</h2>
         <form method="POST" action="Players.php"> <!--refresh page when submitted-->
@@ -251,36 +234,40 @@
             echo "</table>";
         }
 
-        function handleHighestKills(){
+        function handlePlayerAboveKillsThreshold(){
             global $db_conn;
-            if (array_key_exists('highestkills', $_GET)) {
-                //TODO ERIC: check this query pls
-                $result = executePlainSQL("
-                SELECT in_game_name, MAX(sum_kills) as kills
-                FROM (
-                    SELECT tm_id, weapon_name, SUM(kills) as sum_kills
-                    FROM Player AS p
-                    INNER JOIN UsesWeapon AS uw
-                    ON p.tm_id = uw.tm_id
-                    GROUP BY p.tm_id, uw.weapon_name
-                    HAVING SUM(kills) > 0 
-                    ) AS player_kills
-                INNER JOIN TeamMemberContract AS tmc 
-                ON player_kills.tm_id = tmc.tm_id
-                GROUP BY tmr.in_game_name;");
-                showPlayerHighestKills($result);
-                OCICommit($db_conn);
-            }
+
+            $kills_above = $_POST['kills_above'];
+        
+            executePlainSQL("
+                CREATE VIEW player_kills 
+                AS SELECT p.tm_id, SUM(uw.kills) as sum_kills 
+                FROM Player p 
+                INNER JOIN UsesWeapon uw ON p.tm_id = uw.tm_id 
+                GROUP BY p.tm_id
+                HAVING SUM(kills) >" . $kills_above);
+
+            $result = executePlainSQL("
+                SELECT tmc.in_game_name, pk.sum_kills 
+                FROM player_kills pk
+                INNER JOIN TeamMemberContract tmc 
+                ON pk.tm_id = tmc.tm_id");
+
+            executePlainSQL("DROP VIEW player_kills");
+
+            showPlayerHighestKills($result);
+            OCICommit($db_conn);
+            
         }
 
         //TODO CRHIS
-        function showPlayerHighestKills(){
+        function showPlayerHighestKills($result){
             echo "<center><h2>Here are your results!</h2></center>";
             echo "<table>";
             echo "<tr><th>In-game Name</th><th>Number of Kills</th></tr>";
 
-            while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-                echo "<tr><td>" . $row[0] . "</td><td>" . $row[3] . "</td><tr>";
+            while ($row = oci_fetch_row($result)) {
+                echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td><tr>";
             }
             echo "</table>";
         }
@@ -380,6 +367,8 @@
             if (connectToDB()) {
                 if (array_key_exists('checkPlayersSameMatchRequest', $_POST)) {
                     handleCheckPlayersSameMatch();
+                } else if (array_key_exists('PlayerAboveKillsThresholdRequest', $_POST)) {
+                    handlePlayerAboveKillsThreshold();
                 } 
                 disconnectFromDB();
             }
@@ -391,14 +380,12 @@
             if (connectToDB()) {
                 if (array_key_exists('dmg_allWeapons', $_GET)) {
                     handleAvgDmgAllWeapons();
-                } else if (array_key_exists('highestkills', $_GET)) {
-                    handleHighestKills();
                 } 
                 disconnectFromDB();
             }
         }
 
-		if (isset($_POST['checkPlayersSubmit'])) {
+		if (isset($_POST['checkPlayersSubmit']) || isset($_POST['playerAboveKillsThresholdSubmit'])) {
             handlePOSTRequest();
         } else {
             handleGETRequest();
