@@ -97,5 +97,9 @@ tr:nth-child(even) {
 
 .searchResults {
     margin: auto;
-    width: 50%;
+    width: 70%;
+}
+
+.searchResults table {
+    width: 100%;
 }

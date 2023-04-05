@@ -119,7 +119,7 @@
 
                 echo "
                     <div class='attributeBoxes viewRelationFilter pageContent'>
-                        Select attributes for <b>" . $tableName . "</b> relation
+                        Select attributes to view for <b>" . $tableName . "</b> relation
                         <form method='POST' action='Search.php'>
                             <input type='hidden' id='selectAttributesRequest' name='selectAttributesRequest'>
                             <input type='hidden' id='relationName' name='relationName' value='" . $tableName . "'>";
@@ -178,8 +178,10 @@
                 $query .= " FROM " . $table;
 
                 $result = executePlainSQL($query);
-
-                echo "<table class='searchResults'>";
+                
+                echo "<div class='searchResults'>";
+                echo "<h2>" . $table . "</h2>";
+                echo "<table>";
 
                 echo "<tr>";
                 for ($i = 0; $i < sizeof($attributes); $i++) {
@@ -196,6 +198,7 @@
                 }
 
                 echo "</table>";
+                echo "</div>";
 
                 disconnectFromDB();
             } 

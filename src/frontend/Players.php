@@ -6,7 +6,7 @@
     <body>
     <div class="navBar">
             <h1>VCT STATS</h1>
-            <form method="GET" action="Organizations.php">
+            <form method="GET" action="Search.php">
                 <input type="submit" value="Search">
             </form>
             <form method="GET" action="Organizations.php">
