@@ -37,7 +37,7 @@
             Threshold value: <input type="text" name="kills_above"> <br /><br />
             <input type="submit" name="playerAboveKillsThresholdSubmit"></p>
         </form>
-        <h2>Checks if two players have played in the same match</h2>
+        <h2>Look up all Match ID if two players have played in the same match</h2>
         <form method="POST" action="Players.php"> <!--refresh page when submitted-->
             <input type="hidden" id="checkPlayersSameMatchRequest" name="checkPlayersSameMatchRequest">
             First Player: <input type="text" name="player1"> <br /><br />
