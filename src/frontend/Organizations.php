@@ -254,6 +254,16 @@
 
                 //now create an org ID and insert into OrganizationID
                 $randomNumber = rand(10, 100000);
+
+                $checkID = executePlainSQL("SELECT * FROM OrganizationID WHERE o_id=" . $randomNumber);
+                oci_fetch_all($checkID, $out);
+                
+                // Check if o_id is unique
+                while (oci_num_rows($checkID) != 0) {
+                    $randomNumber = rand(10, 100000);
+                    $checkID = executePlainSQL("SELECT * FROM OrganizationID WHERE o_id=" . $randomNumber);
+                    oci_fetch_all($checkID, $out);
+                }
             
                 $tuple2 = array (
                     ":bind1" => $randomNumber,
