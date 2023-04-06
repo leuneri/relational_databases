@@ -28,10 +28,10 @@
                     Winrate: <input type="text" name="ins_winrate"> <br /><br />
                     <input type="submit" value="Insert" name="insertSubmit">
                 </form>
-                <h2>Delete an Organization</h2>
+                <h2>Delete a Match that was Played</h2>
                 <form method="POST" action="Organizations.php"> <!--refresh page when submitted-->
                     <input type="hidden" id="deleteQueryRequest" name="deleteQueryRequest">
-                    Organization to Delete Name: <input type="text" name="del_name"> <br /><br />
+                    Match Played: <input type="text" name="del_matchid"> <br /><br />
                     <input type="submit" value="Delete" name="deleteSubmit">
                 </form>
                 <h2>Update Organization Ranking</h2>
@@ -214,24 +214,9 @@
             function handleDeleteRequest() {
                 global $db_conn;
             
-                //Getting the values from user
-                $tuple = array (
-                    ":bind1" => $_POST['del_name'],
-                );
-            
-                $alltuples = array (
-                    $tuple
-                );
-            
-                $result = executePlainSQL("SELECT OID.o_id 
-                    FROM OrganizationID OID, Organization O
-                    WHERE OID.name = O.name AND O.name = '" . $_POST['del_name'] ."'" );
+                //Getting the values from user     
+                executePlainSQL("DELETE FROM MatchInSeries WHERE m_id = " . $_POST['del_matchid']);
 
-                $row = oci_fetch_row($result);
-                $oid = $row[0];
-                executePlainSQL("DELETE FROM Organization WHERE name = '" . $_POST['del_name'] ."'" );
-                executePlainSQL("DELETE FROM OrganizationID WHERE o_id = '" . $oid ."'" );
-            
                 OCICommit($db_conn);
             }
 
@@ -254,16 +239,6 @@
 
                 //now create an org ID and insert into OrganizationID
                 $randomNumber = rand(10, 100000);
-
-                $checkID = executePlainSQL("SELECT * FROM OrganizationID WHERE o_id=" . $randomNumber);
-                oci_fetch_all($checkID, $out);
-                
-                // Check if o_id is unique
-                while (oci_num_rows($checkID) != 0) {
-                    $randomNumber = rand(10, 100000);
-                    $checkID = executePlainSQL("SELECT * FROM OrganizationID WHERE o_id=" . $randomNumber);
-                    oci_fetch_all($checkID, $out);
-                }
             
                 $tuple2 = array (
                     ":bind1" => $randomNumber,
