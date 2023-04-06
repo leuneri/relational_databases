@@ -30,3 +30,10 @@ This database models characteristics of events and players in the competitive Va
 # Task Assignment
 - Backend: Anna Wang + Eric Leung
 - Frontend: Chris Lee
+
+# Usage
+- Go to terminal and ssh into the UBC undergrad servers
+- Create a directory called "public_html" by inputting `mkdir ~/public_html`
+- Under the public_html folder, input `git clone https://github.students.cs.ubc.ca/CPSC304-2022W-T2/project_f0u2b_m5e3b_s8i3b.git`
+- In the same terminal, input `chmod 711 ~/public_html/project_f0u2b_m5e3b_s8i3b/`
+- Go to https://www.students.cs.ubc.ca/~CWLusername/[Your Desired Page] to test out our page!
