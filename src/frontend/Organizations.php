@@ -34,7 +34,7 @@
                     Match Played: <input type="text" name="del_matchid"> <br /><br />
                     <input type="submit" value="Delete" name="deleteSubmit">
                 </form>
-                <h2>Update Organization Ranking</h2>
+                <h2>Update Organization Win Rate</h2>
                 <form method="POST" action="Organizations.php"> <!--refresh page when submitted-->
                     <input type="hidden" id="updateQueryRequest" name="updateQueryRequest">
                     Organization: <input type="text" name="org_name"> <br /><br />
