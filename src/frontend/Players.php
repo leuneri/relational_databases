@@ -44,6 +44,12 @@
             Second Player: <input type="text" name="player2"> <br /><br />            
             <input type="submit" value="Submit" name="checkPlayersSubmit"></p>
         </form>
+        <h2>See headshot percentage by weapon of a player</h2>
+        <form method="POST" action="Players.php"> <!--refresh page when submitted-->
+            <input type="hidden" id="checkHeadshotPercentage" name="checkHeadshotPercentage">
+            Player Name: <input type="text" name="player1"> <br /><br />           
+            <input type="submit" value="Submit" name="checkHeadshotSubmit"></p>
+        </form>
 
         <?php
 		//this tells the system that it's no longer just parsing html; it's now parsing PHP
@@ -169,6 +175,45 @@
             OCILogoff($db_conn);
         }
 
+        function handleUpdateRequest() {
+            global $db_conn;
+
+            $old_name = $_POST['oldName'];
+            $new_name = $_POST['newName'];
+
+            // you need the wrap the old name and new name values with single quotations
+            executePlainSQL("UPDATE demoTable SET name='" . $new_name . "' WHERE name='" . $old_name . "'");
+            OCICommit($db_conn);
+        }
+
+        function handleResetRequest() {
+            global $db_conn;
+            // Drop old table
+            executePlainSQL("DROP TABLE demoTable");
+
+            // Create new table
+            echo "<br> creating new table <br>";
+            executePlainSQL("CREATE TABLE demoTable (id int PRIMARY KEY, name char(30))");
+            OCICommit($db_conn);
+        }
+
+        function handleInsertRequest() {
+            global $db_conn;
+
+            //Getting the values from user and insert data into the table
+            $tuple = array (
+                ":bind1" => $_POST['insNo'],
+                ":bind2" => $_POST['insName']
+            );
+
+            $alltuples = array (
+                $tuple
+            );
+
+            executeBoundSQL("insert into demoTable values (:bind1, :bind2)", $alltuples);
+            OCICommit($db_conn);
+        }
+
         function handleAvgDmgAllWeapons() {
             if (connectToDB()) {
                 $result = executePlainSQL("SELECT TMC.in_game_name, AVG(UW.average_damage_per_round) 
@@ -179,7 +224,7 @@
             }
         }
 
-        //TODO CHRIS
+
         function showDmgTable($result){
             echo "
                 <table class='playerDmgTable'>
@@ -224,7 +269,7 @@
             
         }
 
-        //TODO CRHIS
+
         function showPlayerHighestKills($result){
             echo "<center><h2>Here are your results!</h2></center>";
             echo "<table>";
@@ -243,11 +288,11 @@
 		    $result = executePlainSQL("SELECT DISTINCT ap1.m_id
                 FROM AgentPlayed ap1
                 INNER JOIN TeamMemberContract tmc1 ON tmc1.tm_id = ap1.tm_id
-                WHERE tmc1.in_game_name = 'TenZ'
+                WHERE tmc1.in_game_name = '" . $player1 . "'
                 AND NOT EXISTS (
                     SELECT *
                     FROM TeamMemberContract tmc2
-                    WHERE tmc2.in_game_name = 'aspas'
+                    WHERE tmc2.in_game_name = '" . $player2 . "'
                     AND NOT EXISTS (
                         SELECT *
                         FROM AgentPlayed ap2
@@ -272,9 +317,43 @@
                     <td>".$row[0]."</td>
                 </tr";
             }
-
             echo "</table>";
         }
+
+        function handleHeadShotPercentage(){
+            global $db_conn;
+            $player1 = $_POST['player1'];
+		    $result = executePlainSQL("SELECT in_game_name, UsesWeapon.weapon_name, headshot_percentage
+            FROM TeamMemberContract
+            INNER JOIN Player
+            ON TeamMemberContract.tm_id = Player.tm_id
+            INNER JOIN UsesWeapon
+            ON UsesWeapon.tm_id = TeamMemberContract.tm_id
+            WHERE in_game_name = '" . $player1 . "'");
+            headShotPercentageTable($player1, $result);
+        }
+
+        function headShotPercentageTable($player1, $result) {
+            echo "<h2>Headshot Percentage by Weapon of ".$player1."</h2>";
+            echo "<table>";
+            echo "
+                <tr>
+                    <th>Player Name</th>
+                    <th>Weapon Name</th>
+                    <th>Headshot Percentage</th>
+                </tr>";
+
+            while ($row = OCI_Fetch_Array($result)) {
+                echo "
+                <tr>
+                    <td>".$row[0]."</td>
+                    <td>".$row[1]."</td>
+                    <td>".$row[2]."</td>
+                </tr";
+            }
+            echo "</table>";
+        }
+
 
         // HANDLE ALL POST ROUTES
 	// A better coding practice is to have one method that reroutes your requests accordingly. It will make it easier to add/remove functionality.
@@ -284,6 +363,8 @@
                     handleCheckPlayersSameMatch();
                 } else if (array_key_exists('PlayerAboveKillsThresholdRequest', $_POST)) {
                     handlePlayerAboveKillsThreshold();
+                } else if (array_key_exists('checkHeadshotPercentage', $_POST)) {
+                    handleHeadShotPercentage();
                 } 
                 disconnectFromDB();
             }
@@ -300,7 +381,7 @@
             }
         }
 
-		if (isset($_POST['checkPlayersSubmit']) || isset($_POST['playerAboveKillsThresholdSubmit'])) {
+		if (isset($_POST['checkPlayersSubmit']) || isset($_POST['playerAboveKillsThresholdSubmit']) || isset($_POST['checkHeadshotSubmit'])) {
             handlePOSTRequest();
         } else {
             handleGETRequest();
